@@ -7,6 +7,7 @@ import { useOnlineStatus } from '../hooks/useOnlineStatus.ts';
 
 type Language = 'en' | 'hi';
 type RoleKey = 'waiter' | 'kitchen' | 'cashier' | 'admin';
+type PendingAction = 'load' | 'reset' | null;
 
 interface RoleCard {
   key: RoleKey;
@@ -22,10 +23,12 @@ const roles: RoleCard[] = [
 ];
 
 const languageStorageKey = 'restaurant-pwa-language';
+const footerIconStyle = { display: 'inline', marginRight: '6px', verticalAlign: '-2px' } as const;
 
 const copy = {
   en: {
     languageLabel: 'Language',
+    languageDisabledHint: 'Language selection is unavailable while demo data is updating.',
     title: 'Restaurant POS',
     subtitle: 'Premium command center for service, kitchen, and billing workflows',
     onlineStatus: 'Live sync available',
@@ -50,6 +53,7 @@ const copy = {
   },
   hi: {
     languageLabel: 'भाषा',
+    languageDisabledHint: 'डेमो डेटा अपडेट होने के दौरान भाषा नहीं बदली जा सकती।',
     title: 'रेस्टोरेंट POS',
     subtitle: 'सेवा, रसोई और बिलिंग वर्कफ़्लो के लिए प्रीमियम कमांड सेंटर',
     onlineStatus: 'लाइव सिंक उपलब्ध है',
@@ -74,6 +78,7 @@ const copy = {
   },
 } satisfies Record<Language, {
   languageLabel: string;
+  languageDisabledHint: string;
   title: string;
   subtitle: string;
   onlineStatus: string;
@@ -95,12 +100,12 @@ const copy = {
 export default function RoleSelection() {
   const navigate = useNavigate();
   const isOnline = useOnlineStatus();
-  const [language, setLanguage] = useState<Language>(() => {
-    if (typeof window === 'undefined') return 'en';
-    return window.localStorage.getItem(languageStorageKey) === 'hi' ? 'hi' : 'en';
-  });
-  const [loading, setLoading] = useState(false);
+  const [language, setLanguage] = useState<Language>(
+    () => (window.localStorage.getItem(languageStorageKey) === 'hi' ? 'hi' : 'en')
+  );
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
   const text = copy[language];
+  const isBusy = pendingAction !== null;
 
   const handleLanguageChange = (nextLanguage: Language) => {
     setLanguage(nextLanguage);
@@ -108,28 +113,30 @@ export default function RoleSelection() {
   };
 
   const handleLoadDemo = async () => {
+    if (isBusy) return;
     if (!window.confirm(text.loadDemoConfirm)) return;
-    setLoading(true);
+    setPendingAction('load');
     try {
       await loadDemoData();
       alert(text.loadDemoSuccess);
     } catch (err) {
       alert(text.loadDemoError + (err instanceof Error ? err.message : String(err)));
     } finally {
-      setLoading(false);
+      setPendingAction(null);
     }
   };
 
   const handleResetDemo = async () => {
+    if (isBusy) return;
     if (!window.confirm(text.resetDemoConfirm)) return;
-    setLoading(true);
+    setPendingAction('reset');
     try {
       await resetDemoData();
       alert(text.resetDemoSuccess);
     } catch (err) {
       alert(text.resetDemoError + (err instanceof Error ? err.message : String(err)));
     } finally {
-      setLoading(false);
+      setPendingAction(null);
     }
   };
 
@@ -139,21 +146,28 @@ export default function RoleSelection() {
         <div className="role-logo"><Receipt size={28} /></div>
         <h1 className="page-title">{text.title}</h1>
         <p className="page-subtitle">{text.subtitle}</p>
-        <div style={{ width: '100%', maxWidth: 240, margin: '16px auto 0', textAlign: 'left' }}>
-          <label htmlFor="language-select" style={{ fontWeight: 600, marginBottom: '8px' }}>
+        <div className="role-language-selector">
+          <label htmlFor="language-select" className="role-language-label">
             {text.languageLabel}
           </label>
           <select
             id="language-select"
             value={language}
             aria-label={text.languageLabel}
+            aria-describedby={isBusy ? 'language-selector-help' : undefined}
             onChange={(e) => handleLanguageChange(e.target.value as Language)}
+            disabled={isBusy}
           >
             <option value="en">English</option>
             <option value="hi">हिंदी</option>
           </select>
+          {isBusy && (
+            <p id="language-selector-help" className="sr-only">
+              {text.languageDisabledHint}
+            </p>
+          )}
         </div>
-        <p style={{ marginTop: '10px' }}>
+        <p className="role-status-text">
           <span className={isOnline ? 'online-indicator' : 'offline-indicator'}>
             {isOnline ? text.onlineStatus : text.offlineStatus}
           </span>
@@ -181,16 +195,16 @@ export default function RoleSelection() {
       </div>
 
       <p className="role-footer">
-        <CircleAlert size={16} style={{ display: 'inline', marginRight: "6px", verticalAlign: '-2px' }} />
+        <CircleAlert size={16} style={footerIconStyle} />
         {text.footer}
       </p>
 
-      <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <button className="btn btn-primary" onClick={handleLoadDemo} disabled={loading}>
-          {loading ? text.loadingDemo : text.loadDemo}
+      <div className="role-actions">
+        <button className="btn btn-primary" onClick={handleLoadDemo} disabled={isBusy}>
+          {pendingAction === 'load' ? text.loadingDemo : text.loadDemo}
         </button>
-        <button className="btn btn-secondary" onClick={handleResetDemo} disabled={loading}>
-          {loading ? text.resettingDemo : text.resetDemo}
+        <button className="btn btn-secondary" onClick={handleResetDemo} disabled={isBusy}>
+          {pendingAction === 'reset' ? text.resettingDemo : text.resetDemo}
         </button>
       </div>
     </div>
