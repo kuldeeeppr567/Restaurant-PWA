@@ -1,0 +1,134 @@
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { sessionRepository } from '../../repositories/sessionRepository.ts';
+import { orderRepository } from '../../repositories/orderRepository.ts';
+import { paymentRepository } from '../../repositories/paymentRepository.ts';
+import { tableRepository } from '../../repositories/tableRepository.ts';
+import { PAYMENT_METHOD_LABELS } from '../../types/index.ts';
+import type { DiningSession, OrderItem, Payment } from '../../types/index.ts';
+
+export default function ReceiptPage() {
+  const { sessionId } = useParams<{ sessionId: string }>();
+  const navigate = useNavigate();
+  const [session, setSession] = useState<DiningSession | null>(null);
+  const [items, setItems] = useState<OrderItem[]>([]);
+  const [payment, setPayment] = useState<Payment | null>(null);
+  const [tableName, setTableName] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      if (!sessionId) return;
+      const id = Number(sessionId);
+      const s = await sessionRepository.getById(id);
+      if (s) {
+        setSession(s);
+        setTableName(s.tableName);
+        const table = await tableRepository.getById(s.tableId);
+        if (table) setTableName(table.name);
+      }
+      const orderItems = await orderRepository.getBySessionId(id);
+      setItems(orderItems.filter((i) => i.status !== 'cancelled'));
+      const p = await paymentRepository.getBySessionId(id);
+      if (p) setPayment(p);
+      setLoading(false);
+    };
+    load();
+  }, [sessionId]);
+
+  if (loading) return <div className="p-4">Loading...</div>;
+  if (!session || !payment) return <div className="p-4">Receipt not found.</div>;
+
+  const paidDate = new Date(payment.paidAt);
+
+  return (
+    <div className="p-4 max-w-md mx-auto">
+      <div className="no-print mb-4 flex gap-2">
+        <button
+          onClick={() => navigate(-1)}
+          className="text-blue-600 underline"
+        >
+          &larr; Back
+        </button>
+        <button
+          onClick={() => window.print()}
+          className="ml-auto bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Print
+        </button>
+      </div>
+
+      <div className="receipt border p-6 text-sm">
+        <div className="text-center mb-4">
+          <h1 className="text-xl font-bold">Dosa Delight Restaurant</h1>
+          <p className="text-gray-500">
+            {paidDate.toLocaleDateString()} {paidDate.toLocaleTimeString()}
+          </p>
+          <p className="font-semibold">{tableName}</p>
+        </div>
+
+        <table className="w-full mb-3">
+          <thead>
+            <tr className="border-b">
+              <th className="text-left py-1">Item</th>
+              <th className="text-center py-1">Qty</th>
+              <th className="text-right py-1">Price</th>
+              <th className="text-right py-1">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item) => (
+              <tr key={item.id} className="border-b border-dashed">
+                <td className="py-1">{item.itemName}</td>
+                <td className="text-center py-1">{item.quantity}</td>
+                <td className="text-right py-1">{'\u20B9'}{item.priceSnapshot}</td>
+                <td className="text-right py-1">{'\u20B9'}{item.priceSnapshot * item.quantity}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div className="space-y-1 border-t pt-2">
+          <div className="flex justify-between">
+            <span>Subtotal</span>
+            <span>{'\u20B9'}{payment.subtotal}</span>
+          </div>
+          {payment.discountAmount > 0 && (
+            <div className="flex justify-between">
+              <span>
+                Discount
+                {payment.discountType === 'percentage' ? ` (${payment.discountValue}%)` : ''}
+              </span>
+              <span>-{'\u20B9'}{payment.discountAmount}</span>
+            </div>
+          )}
+          <div className="flex justify-between">
+            <span>GST ({payment.taxRate}%)</span>
+            <span>{'\u20B9'}{payment.taxAmount}</span>
+          </div>
+          <div className="flex justify-between font-bold text-base border-t pt-1">
+            <span>Grand Total</span>
+            <span>{'\u20B9'}{payment.total}</span>
+          </div>
+        </div>
+
+        <div className="mt-3 pt-2 border-t text-sm">
+          <div className="flex justify-between">
+            <span>Payment</span>
+            <span>{PAYMENT_METHOD_LABELS[payment.method]}</span>
+          </div>
+          {payment.referenceNumber && (
+            <div className="flex justify-between">
+              <span>Ref #</span>
+              <span>{payment.referenceNumber}</span>
+            </div>
+          )}
+        </div>
+
+        <div className="text-center mt-6 text-gray-500">
+          <p>Thank you! Visit again!</p>
+        </div>
+      </div>
+    </div>
+  );
+}
