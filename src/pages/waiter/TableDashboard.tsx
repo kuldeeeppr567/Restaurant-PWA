@@ -39,7 +39,6 @@ export default function TableDashboard() {
     if (table.status === 'available') {
       const existingSession = await sessionRepository.getByTableId(table.id!);
       if (existingSession?.id) {
-        await tableRepository.updateStatus(table.id!, 'available', existingSession.id);
         navigate(`/waiter/table/${table.id}`);
         return;
       }
@@ -48,6 +47,7 @@ export default function TableDashboard() {
         tableId: table.id!,
         tableName: table.name,
         openedAt: new Date().toISOString(),
+        // Keep table available until at least one item is added.
         status: 'available',
       });
       await tableRepository.updateStatus(table.id!, 'available', sessionId);

@@ -82,7 +82,7 @@ export async function loadDemoData(): Promise<void> {
     const resolveMenu = (name: string) => {
       const item = menuByName.get(name);
       if (!item?.id) {
-        throw new Error(`Demo menu item not found: ${name}`);
+        throw new Error(`Demo menu item not found: ${name}. Check that the item exists in menuItemsData.`);
       }
       return item;
     };

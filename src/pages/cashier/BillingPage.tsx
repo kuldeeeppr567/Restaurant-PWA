@@ -101,7 +101,7 @@ export default function BillingPage() {
     await loadTables();
   };
 
-  const handleDone = async () => {
+  const handleDone = () => {
     setSelectedTable(null);
     setSession(null);
     setOrderItems([]);

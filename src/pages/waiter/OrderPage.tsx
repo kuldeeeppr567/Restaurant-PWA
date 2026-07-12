@@ -14,10 +14,13 @@ interface DraftItem {
   customNotes: string;
 }
 
+const FALLBACK_BROAD_CATEGORY = 'Uncategorized';
+const FALLBACK_SUB_CATEGORY = 'General';
+
 function splitCategory(category: string): { broad: string; sub: string } {
   const [broad, ...rest] = category.split('>').map((part) => part.trim()).filter(Boolean);
-  if (!broad) return { broad: 'Other', sub: 'General' };
-  if (rest.length === 0) return { broad, sub: 'General' };
+  if (!broad) return { broad: FALLBACK_BROAD_CATEGORY, sub: FALLBACK_SUB_CATEGORY };
+  if (rest.length === 0) return { broad, sub: FALLBACK_SUB_CATEGORY };
   return { broad, sub: rest.join(' > ') };
 }
 
@@ -41,8 +44,11 @@ export default function OrderPage() {
     if (!table?.id || !sessionId) return;
     const activeItems = items.filter((item) => item.status !== 'cancelled');
     if (activeItems.length === 0) {
-      await tableRepository.updateStatus(table.id, 'available', sessionId);
-      await sessionRepository.update(sessionId, { status: 'available' });
+      const shouldKeepStatus = table.status === 'billing_requested' || table.status === 'ready_for_cleaning';
+      if (!shouldKeepStatus && table.status !== 'available') {
+        await tableRepository.updateStatus(table.id, 'available', sessionId);
+        await sessionRepository.update(sessionId, { status: 'available' });
+      }
       return;
     }
 
@@ -150,14 +156,12 @@ export default function OrderPage() {
       orderedAt: now,
     }));
     await orderRepository.bulkCreate(items);
-    if (table?.id) {
-      await tableRepository.updateStatus(table.id, 'occupied', sessionId);
-      await sessionRepository.update(sessionId, { status: 'occupied' });
-    }
+    const updatedItems = await orderRepository.getBySessionId(sessionId);
+    await syncTableStatusWithItems(updatedItems);
     setShowPicker(false);
     setDraftItems([]);
     fetchData();
-  }, [sessionId, tableId, draftItems, table, fetchData]);
+  }, [sessionId, tableId, draftItems, syncTableStatusWithItems, fetchData]);
 
   const submitToKitchen = useCallback(async () => {
     const drafts = orderItems.filter((i) => i.status === 'draft');
@@ -177,11 +181,15 @@ export default function OrderPage() {
 
   const removeOrderItem = useCallback(async (itemId: number) => {
     if (!sessionId) return;
+    const existingItem = orderItems.find((item) => item.id === itemId);
+    if (!existingItem || existingItem.status !== 'draft') return;
     await orderRepository.remove(itemId);
     const updatedItems = await orderRepository.getBySessionId(sessionId);
     await syncTableStatusWithItems(updatedItems);
-    await fetchData();
-  }, [sessionId, syncTableStatusWithItems, fetchData]);
+    setOrderItems(updatedItems);
+    const refreshedTable = await tableRepository.getById(parseInt(tableId!, 10));
+    setTable(refreshedTable ?? null);
+  }, [sessionId, orderItems, syncTableStatusWithItems, tableId]);
 
   const requestBilling = useCallback(async () => {
     if (!table || !sessionId) return;
@@ -199,7 +207,7 @@ export default function OrderPage() {
     return acc;
   }, {} as Record<OrderItemStatus, OrderItem[]>);
 
-  const statusOrder: OrderItemStatus[] = ['draft', 'submitted', 'preparing', 'ready', 'served'];
+  const statusOrder: OrderItemStatus[] = ['draft', 'submitted', 'preparing', 'ready', 'served', 'cancelled'];
   const filteredMenuItems = menuItems.filter((menuItem) => {
     const { broad, sub } = splitCategory(menuItem.category);
     return broad === selectedBroadCategory && sub === selectedSubCategory;
