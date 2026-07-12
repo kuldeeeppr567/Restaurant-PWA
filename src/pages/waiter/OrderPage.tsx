@@ -102,8 +102,7 @@ export default function OrderPage() {
     const session = await ensureActiveSession(t);
     const items = session?.id ? await orderRepository.getBySessionId(session.id) : [];
 
-    t.currentSessionId = session?.id;
-    setTable(t);
+    setTable({ ...t, currentSessionId: session?.id });
     setSessionId(session?.id ?? null);
     setOrderItems(items);
     setLoading(false);
