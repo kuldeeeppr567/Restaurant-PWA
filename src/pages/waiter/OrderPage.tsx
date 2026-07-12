@@ -43,13 +43,13 @@ export default function OrderPage() {
   const ensureActiveSession = useCallback(async (restaurantTable: RestaurantTable) => {
     if (!restaurantTable.id) return null;
 
-    const existingByCurrentId = restaurantTable.currentSessionId
+    const existingSession = restaurantTable.currentSessionId
       ? await sessionRepository.getById(restaurantTable.currentSessionId)
       : undefined;
-    const activeFromCurrentId = existingByCurrentId && !existingByCurrentId.closedAt
-      ? existingByCurrentId
+    const currentSession = existingSession && !existingSession.closedAt
+      ? existingSession
       : undefined;
-    const activeSession = activeFromCurrentId ?? await sessionRepository.getByTableId(restaurantTable.id);
+    const activeSession = currentSession ?? await sessionRepository.getByTableId(restaurantTable.id);
 
     if (activeSession?.id) {
       if (restaurantTable.currentSessionId !== activeSession.id) {
@@ -102,7 +102,8 @@ export default function OrderPage() {
     const session = await ensureActiveSession(t);
     const items = session?.id ? await orderRepository.getBySessionId(session.id) : [];
 
-    setTable({ ...t, currentSessionId: session?.id });
+    t.currentSessionId = session?.id;
+    setTable(t);
     setSessionId(session?.id ?? null);
     setOrderItems(items);
     setLoading(false);
