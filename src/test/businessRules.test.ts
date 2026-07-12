@@ -1,4 +1,5 @@
 import type { OrderItem } from '../types/index.ts';
+import { getSpecialInstructionsForCategory } from '../types/index.ts';
 import {
   calculateSubtotal,
   calculateDiscount,
@@ -83,5 +84,23 @@ describe('Billing calculations', () => {
 
   it('returns 0 subtotal for empty order', () => {
     expect(calculateSubtotal([])).toBe(0);
+  });
+});
+
+describe('Category-driven instructions', () => {
+  it('returns South Indian instructions for dosa-style items', () => {
+    expect(getSpecialInstructionsForCategory('Indian > South Indian')).toEqual(
+      expect.arrayContaining(['Extra crispy', 'Less oil'])
+    );
+  });
+
+  it('returns beverage-specific instructions for cold drinks', () => {
+    expect(getSpecialInstructionsForCategory('Beverages > Cold')).toEqual(
+      expect.arrayContaining(['Less sugar', 'No ice'])
+    );
+  });
+
+  it('falls back to a safe default for unknown categories', () => {
+    expect(getSpecialInstructionsForCategory('Custom > Specials')).toEqual(['Less spicy', 'No onion']);
   });
 });

@@ -81,17 +81,32 @@ export interface Payment {
   paidAt: string;
 }
 
-export const SPECIAL_INSTRUCTIONS = [
-  'Less oil',
-  'Extra cheese',
-  'No onion',
-  'Less spicy',
-  'Extra crispy',
-  'Extra spicy',
-  'No garlic',
-  'Extra butter',
-  'Well done',
-];
+const DEFAULT_SPECIAL_INSTRUCTIONS = ['Less spicy', 'No onion'];
+const LESS_SUGAR = 'Less sugar';
+const NO_SUGAR = 'No sugar';
+const SOUTH_INDIAN_CATEGORY = 'Indian > South Indian';
+const NORTH_INDIAN_CATEGORY = 'Indian > North Indian';
+const ITALIAN_CATEGORY = 'Global > Italian';
+const STREET_FOOD_CATEGORY = 'Global > Street Food';
+const INDO_CHINESE_CATEGORY = 'Asian > Indo-Chinese';
+const HOT_BEVERAGES_CATEGORY = 'Beverages > Hot';
+const COLD_BEVERAGES_CATEGORY = 'Beverages > Cold';
+const INDIAN_DESSERTS_CATEGORY = 'Desserts > Indian';
+
+const SPECIAL_INSTRUCTIONS_BY_CATEGORY: Record<string, string[]> = {
+  [SOUTH_INDIAN_CATEGORY]: ['Extra crispy', 'Less oil', 'Less spicy', 'Extra spicy', 'No onion'],
+  [NORTH_INDIAN_CATEGORY]: ['Less oil', 'Less spicy', 'Extra spicy', 'No onion', 'No garlic', 'Extra butter'],
+  [ITALIAN_CATEGORY]: ['Extra cheese', 'Less spicy', 'Extra spicy', 'No onion', 'No garlic', 'Well done'],
+  [STREET_FOOD_CATEGORY]: ['Extra crispy', 'Extra cheese', 'Less spicy', 'Extra spicy', 'No onion'],
+  [INDO_CHINESE_CATEGORY]: ['Less oil', 'Less spicy', 'Extra spicy', 'No onion', 'No garlic'],
+  [HOT_BEVERAGES_CATEGORY]: [LESS_SUGAR, NO_SUGAR, 'Extra hot'],
+  [COLD_BEVERAGES_CATEGORY]: [LESS_SUGAR, NO_SUGAR, 'Less ice', 'No ice'],
+  [INDIAN_DESSERTS_CATEGORY]: [LESS_SUGAR],
+};
+
+export function getSpecialInstructionsForCategory(category: string): string[] {
+  return SPECIAL_INSTRUCTIONS_BY_CATEGORY[category] ?? DEFAULT_SPECIAL_INSTRUCTIONS;
+}
 
 export const SERVICE_REQUEST_LABELS: Record<ServiceRequestType, string> = {
   chutney: 'Chutney Refill',
