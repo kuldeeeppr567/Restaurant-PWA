@@ -14,6 +14,13 @@ interface DraftItem {
   customNotes: string;
 }
 
+function splitCategory(category: string): { broad: string; sub: string } {
+  const [broad, ...rest] = category.split('>').map((part) => part.trim()).filter(Boolean);
+  if (!broad) return { broad: 'Other', sub: 'General' };
+  if (rest.length === 0) return { broad, sub: 'General' };
+  return { broad, sub: rest.join(' > ') };
+}
+
 export default function OrderPage() {
   const { tableId } = useParams<{ tableId: string }>();
   const navigate = useNavigate();
@@ -25,9 +32,25 @@ export default function OrderPage() {
   // Menu picker state
   const [showPicker, setShowPicker] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [categoryTree, setCategoryTree] = useState<Record<string, string[]>>({});
+  const [selectedBroadCategory, setSelectedBroadCategory] = useState<string>('');
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>('');
   const [draftItems, setDraftItems] = useState<DraftItem[]>([]);
+
+  const syncTableStatusWithItems = useCallback(async (items: OrderItem[]) => {
+    if (!table?.id || !sessionId) return;
+    const activeItems = items.filter((item) => item.status !== 'cancelled');
+    if (activeItems.length === 0) {
+      await tableRepository.updateStatus(table.id, 'available', sessionId);
+      await sessionRepository.update(sessionId, { status: 'available' });
+      return;
+    }
+
+    if (table.status === 'available') {
+      await tableRepository.updateStatus(table.id, 'occupied', sessionId);
+      await sessionRepository.update(sessionId, { status: 'occupied' });
+    }
+  }, [table, sessionId]);
 
   const fetchData = useCallback(async () => {
     if (!tableId) return;
@@ -52,10 +75,25 @@ export default function OrderPage() {
 
   const openPicker = useCallback(async () => {
     const available = await menuRepository.getAvailable();
-    const cats = await menuRepository.getCategories();
+    const tree = available.reduce<Record<string, Set<string>>>((acc, item) => {
+      const { broad, sub } = splitCategory(item.category);
+      if (!acc[broad]) acc[broad] = new Set<string>();
+      acc[broad].add(sub);
+      return acc;
+    }, {});
+
+    const normalizedTree = Object.fromEntries(
+      Object.entries(tree)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([broad, subs]) => [broad, Array.from(subs).sort((a, b) => a.localeCompare(b))])
+    );
+    const firstBroad = Object.keys(normalizedTree)[0] || '';
+    const firstSub = normalizedTree[firstBroad]?.[0] || '';
+
     setMenuItems(available);
-    setCategories(cats);
-    setSelectedCategory(cats[0] || '');
+    setCategoryTree(normalizedTree);
+    setSelectedBroadCategory(firstBroad);
+    setSelectedSubCategory(firstSub);
     setDraftItems([]);
     setShowPicker(true);
   }, []);
@@ -112,10 +150,14 @@ export default function OrderPage() {
       orderedAt: now,
     }));
     await orderRepository.bulkCreate(items);
+    if (table?.id) {
+      await tableRepository.updateStatus(table.id, 'occupied', sessionId);
+      await sessionRepository.update(sessionId, { status: 'occupied' });
+    }
     setShowPicker(false);
     setDraftItems([]);
     fetchData();
-  }, [sessionId, tableId, draftItems, fetchData]);
+  }, [sessionId, tableId, draftItems, table, fetchData]);
 
   const submitToKitchen = useCallback(async () => {
     const drafts = orderItems.filter((i) => i.status === 'draft');
@@ -133,6 +175,14 @@ export default function OrderPage() {
     fetchData();
   }, [fetchData]);
 
+  const removeOrderItem = useCallback(async (itemId: number) => {
+    if (!sessionId) return;
+    await orderRepository.remove(itemId);
+    const updatedItems = await orderRepository.getBySessionId(sessionId);
+    await syncTableStatusWithItems(updatedItems);
+    await fetchData();
+  }, [sessionId, syncTableStatusWithItems, fetchData]);
+
   const requestBilling = useCallback(async () => {
     if (!table || !sessionId) return;
     await tableRepository.updateStatus(table.id!, 'billing_requested', sessionId);
@@ -149,8 +199,11 @@ export default function OrderPage() {
     return acc;
   }, {} as Record<OrderItemStatus, OrderItem[]>);
 
-  const statusOrder: OrderItemStatus[] = ['draft', 'submitted', 'preparing', 'ready', 'served', 'cancelled'];
-  const filteredMenuItems = menuItems.filter((m) => m.category === selectedCategory);
+  const statusOrder: OrderItemStatus[] = ['draft', 'submitted', 'preparing', 'ready', 'served'];
+  const filteredMenuItems = menuItems.filter((menuItem) => {
+    const { broad, sub } = splitCategory(menuItem.category);
+    return broad === selectedBroadCategory && sub === selectedSubCategory;
+  });
 
   return (
     <div className="page-container">
@@ -189,6 +242,9 @@ export default function OrderPage() {
                 {item.status === 'ready' && (
                   <button className="btn btn-primary" onClick={() => markServed(item.id!)}>Mark Served</button>
                 )}
+                {item.status === 'draft' && (
+                  <button className="btn btn-danger" onClick={() => removeOrderItem(item.id!)}>Remove</button>
+                )}
               </div>
             ))}
           </div>
@@ -214,18 +270,34 @@ export default function OrderPage() {
             <button className="btn btn-secondary" onClick={() => setShowPicker(false)}>Close</button>
           </div>
 
-          {/* Category tabs */}
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                className={`btn ${selectedCategory === cat ? 'btn-primary' : 'btn-secondary'}`}
-                onClick={() => setSelectedCategory(cat)}
-                style={{ fontSize: '0.85rem' }}
-              >
-                {cat}
-              </button>
-            ))}
+          {/* Category selectors */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '1rem' }}>
+            <select
+              value={selectedBroadCategory}
+              onChange={(e) => {
+                const nextBroad = e.target.value;
+                setSelectedBroadCategory(nextBroad);
+                setSelectedSubCategory(categoryTree[nextBroad]?.[0] || '');
+              }}
+              className="input"
+            >
+              {Object.keys(categoryTree).map((broad) => (
+                <option key={broad} value={broad}>
+                  {broad}
+                </option>
+              ))}
+            </select>
+            <select
+              value={selectedSubCategory}
+              onChange={(e) => setSelectedSubCategory(e.target.value)}
+              className="input"
+            >
+              {(categoryTree[selectedBroadCategory] || []).map((sub) => (
+                <option key={sub} value={sub}>
+                  {sub}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Menu items */}

@@ -5,18 +5,21 @@ import { TABLE_STATUS_LABELS } from '../../types/index.ts';
 import { tableRepository } from '../../repositories/tableRepository.ts';
 import { sessionRepository } from '../../repositories/sessionRepository.ts';
 
-const statusColors: Record<string, string> = {
-  available: 'badge-success',
-  occupied: 'badge-warning',
-  order_in_progress: 'badge-warning',
-  billing_requested: 'badge-info',
-  paid: 'badge-success',
-  ready_for_cleaning: 'badge-danger',
+const statusColors: Record<string, { bg: string; border: string }> = {
+  available: { bg: 'var(--status-available-bg)', border: 'var(--status-available)' },
+  occupied: { bg: 'var(--status-occupied-bg)', border: 'var(--status-occupied)' },
+  order_in_progress: { bg: 'var(--status-preparing-bg)', border: 'var(--status-preparing)' },
+  billing_requested: { bg: 'var(--status-billing-bg)', border: 'var(--status-billing)' },
+  paid: { bg: 'var(--status-paid-bg)', border: 'var(--status-paid)' },
+  ready_for_cleaning: { bg: 'var(--status-cleaning-bg)', border: 'var(--status-cleaning)' },
 };
+
+type TableFilter = 'all' | 'available' | 'occupied';
 
 export default function TableDashboard() {
   const navigate = useNavigate();
   const [tables, setTables] = useState<RestaurantTable[]>([]);
+  const [filter, setFilter] = useState<TableFilter>('all');
   const [loading, setLoading] = useState(true);
 
   const fetchTables = useCallback(async () => {
@@ -34,13 +37,20 @@ export default function TableDashboard() {
 
   const handleTableClick = useCallback(async (table: RestaurantTable) => {
     if (table.status === 'available') {
+      const existingSession = await sessionRepository.getByTableId(table.id!);
+      if (existingSession?.id) {
+        await tableRepository.updateStatus(table.id!, 'available', existingSession.id);
+        navigate(`/waiter/table/${table.id}`);
+        return;
+      }
+
       const sessionId = await sessionRepository.create({
         tableId: table.id!,
         tableName: table.name,
         openedAt: new Date().toISOString(),
-        status: 'occupied',
+        status: 'available',
       });
-      await tableRepository.updateStatus(table.id!, 'occupied', sessionId);
+      await tableRepository.updateStatus(table.id!, 'available', sessionId);
       navigate(`/waiter/table/${table.id}`);
     } else if (table.status === 'occupied' || table.status === 'order_in_progress') {
       navigate(`/waiter/table/${table.id}`);
@@ -58,26 +68,45 @@ export default function TableDashboard() {
     return <div className="page-container"><p>Loading tables...</p></div>;
   }
 
+  const filteredTables = tables.filter((table) => {
+    if (filter === 'all') return true;
+    if (filter === 'available') return table.status === 'available';
+    return table.status !== 'available';
+  });
+
   return (
     <div className="page-container">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', gap: '1rem', flexWrap: 'wrap' }}>
         <h1>Tables</h1>
-        <button className="btn btn-secondary" onClick={() => navigate('/')}>Back</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <button className={`btn ${filter === 'all' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setFilter('all')}>All</button>
+          <button className={`btn ${filter === 'occupied' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setFilter('occupied')}>Occupied</button>
+          <button className={`btn ${filter === 'available' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setFilter('available')}>Available</button>
+          <button className="btn btn-secondary" onClick={() => navigate('/')}>Back</button>
+        </div>
       </div>
 
       {tables.length === 0 ? (
         <p>No tables found. Load demo data from the home page.</p>
+      ) : filteredTables.length === 0 ? (
+        <p>No tables match this filter.</p>
       ) : (
         <div className="grid">
-          {tables.map((table) => (
+          {filteredTables.map((table) => (
             <div
               key={table.id}
               className="card"
-              style={{ cursor: 'pointer', textAlign: 'center' }}
+              style={{
+                cursor: 'pointer',
+                textAlign: 'center',
+                background: statusColors[table.status]?.bg ?? 'var(--surface)',
+                borderColor: statusColors[table.status]?.border ?? 'var(--border)',
+                borderWidth: '2px',
+              }}
               onClick={() => handleTableClick(table)}
             >
               <h2 style={{ marginBottom: '0.5rem' }}>{table.name}</h2>
-              <span className={`badge ${statusColors[table.status] || ''}`}>
+              <span className={`status-badge ${table.status}`}>
                 {TABLE_STATUS_LABELS[table.status] || table.status}
               </span>
               <p style={{ marginTop: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>

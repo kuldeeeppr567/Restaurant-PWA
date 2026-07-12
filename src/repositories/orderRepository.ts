@@ -35,4 +35,8 @@ export const orderRepository = {
     if (status === 'served') changes.servedAt = now;
     await db.orderItems.update(id, changes);
   },
+
+  async remove(id: number): Promise<void> {
+    await db.orderItems.delete(id);
+  },
 };
