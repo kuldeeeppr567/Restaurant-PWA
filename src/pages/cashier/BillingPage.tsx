@@ -1,11 +1,22 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ArrowLeft, CreditCard, Landmark, QrCode, Wallet } from 'lucide-react';
 import { tableRepository } from '../../repositories/tableRepository.ts';
 import { sessionRepository } from '../../repositories/sessionRepository.ts';
 import { orderRepository } from '../../repositories/orderRepository.ts';
 import { paymentRepository } from '../../repositories/paymentRepository.ts';
 import { PAYMENT_METHOD_LABELS } from '../../types/index.ts';
 import type { RestaurantTable, DiningSession, OrderItem, PaymentMethod } from '../../types/index.ts';
+
+const paymentIcons: Record<PaymentMethod, JSX.Element> = {
+  cash: <Wallet size={18} />,
+  card: <CreditCard size={18} />,
+  phonepe: <QrCode size={18} />,
+  paytm: <QrCode size={18} />,
+  other_upi: <QrCode size={18} />,
+  mixed: <Landmark size={18} />,
+};
 
 export default function BillingPage() {
   const navigate = useNavigate();
@@ -61,12 +72,7 @@ export default function BillingPage() {
   };
 
   const subtotal = orderItems.reduce((sum, item) => sum + item.priceSnapshot * item.quantity, 0);
-
-  const discountAmount =
-    discountType === 'percentage'
-      ? Math.round((subtotal * discountValue) / 100)
-      : discountValue;
-
+  const discountAmount = discountType === 'percentage' ? Math.round((subtotal * discountValue) / 100) : discountValue;
   const taxableAmount = subtotal - discountAmount;
   const taxRate = 5;
   const taxAmount = Math.round((taxableAmount * taxRate) / 100);
@@ -74,9 +80,7 @@ export default function BillingPage() {
 
   const handleRecordPayment = async () => {
     if (!session?.id || !selectedTable?.id) return;
-    const confirmed = window.confirm(
-      `Record payment of \u20B9${grandTotal} via ${PAYMENT_METHOD_LABELS[paymentMethod]}?`
-    );
+    const confirmed = window.confirm(`Record payment of \u20B9${grandTotal} via ${PAYMENT_METHOD_LABELS[paymentMethod]}?`);
     if (!confirmed) return;
 
     await paymentRepository.create({
@@ -109,9 +113,7 @@ export default function BillingPage() {
   };
 
   const handlePrintReceipt = () => {
-    if (session?.id) {
-      navigate(`/cashier/receipt/${session.id}`);
-    }
+    if (session?.id) navigate(`/cashier/receipt/${session.id}`);
   };
 
   const goBack = () => {
@@ -121,31 +123,35 @@ export default function BillingPage() {
     setIsPaid(false);
   };
 
-  if (loading) return <div className="p-4">Loading...</div>;
+  if (loading) return <div className="page-container"><p>Loading...</p></div>;
 
   if (!selectedTable) {
     return (
-      <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">Billing</h1>
+      <div className="page-container">
+        <div className="page-header">
+          <div>
+            <h1 className="page-title">Billing</h1>
+            <p className="page-subtitle">Select a table to generate or settle the bill</p>
+          </div>
+        </div>
+
         {tables.length === 0 ? (
-          <p className="text-gray-500">No tables require billing.</p>
+          <p className="page-subtitle">No tables require billing.</p>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="table-grid">
             {tables.map((table) => (
-              <button
+              <motion.button
                 key={table.id}
                 onClick={() => selectTable(table)}
-                className={`p-4 rounded-lg border-2 text-left ${
-                  table.status === 'billing_requested'
-                    ? 'border-orange-500 bg-orange-50'
-                    : table.status === 'paid'
-                      ? 'border-green-500 bg-green-50'
-                      : 'border-blue-500 bg-blue-50'
-                }`}
+                className={`card table-tile status-tint-${table.status}`}
+                whileHover={{ y: -4 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <div className="font-bold text-lg">{table.name}</div>
-                <div className="text-sm capitalize">{table.status.replace(/_/g, ' ')}</div>
-              </button>
+                <div className="text-left">
+                  <div className="text-2xl font-bold">{table.name}</div>
+                  <div style={{ marginTop: 10 }} className={`status-badge ${table.status}`}>{table.status.replace(/_/g, ' ')}</div>
+                </div>
+              </motion.button>
             ))}
           </div>
         )}
@@ -154,136 +160,93 @@ export default function BillingPage() {
   }
 
   return (
-    <div className="p-4 max-w-2xl mx-auto">
-      <button onClick={goBack} className="mb-4 text-blue-600 underline">
-        &larr; Back to tables
+    <div className="page-container" style={{ maxWidth: '860px' }}>
+      <button onClick={goBack} className="btn btn-secondary" style={{ marginBottom: '16px' }}>
+        <ArrowLeft size={16} /> Back to tables
       </button>
-      <h1 className="text-2xl font-bold mb-2">{selectedTable.name} - Bill</h1>
 
-      <table className="w-full mb-4 border-collapse">
-        <thead>
-          <tr className="border-b-2">
-            <th className="text-left py-2">Item</th>
-            <th className="text-center py-2">Qty</th>
-            <th className="text-right py-2">Price</th>
-            <th className="text-right py-2">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orderItems.map((item) => (
-            <tr key={item.id} className="border-b">
-              <td className="py-2">{item.itemName}</td>
-              <td className="text-center py-2">{item.quantity}</td>
-              <td className="text-right py-2">{'\u20B9'}{item.priceSnapshot}</td>
-              <td className="text-right py-2">{'\u20B9'}{item.priceSnapshot * item.quantity}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="card billing-summary" style={{ marginBottom: '20px' }}>
+        <h1 className="page-title" style={{ fontSize: '1.8rem', marginBottom: 6 }}>{selectedTable.name} Bill</h1>
+        <p className="page-subtitle">Wallet-style order summary and payment settlement</p>
+      </div>
 
-      <div className="space-y-2 mb-4">
-        <div className="flex justify-between">
-          <span>Subtotal</span>
-          <span>{'\u20B9'}{subtotal}</span>
+      <div className="billing-layout">
+        <div className="card">
+          <div className="table-wrap" style={{ marginBottom: '12px' }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Qty</th>
+                  <th>Price</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orderItems.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.itemName}</td>
+                    <td>{item.quantity}</td>
+                    <td>\u20B9{item.priceSnapshot}</td>
+                    <td>\u20B9{item.priceSnapshot * item.quantity}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="bill-row"><span>Subtotal</span><span>\u20B9{subtotal}</span></div>
+
+          {!isPaid && (
+            <div className="bill-row" style={{ alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              <span>Discount</span>
+              <select value={discountType} onChange={(e) => setDiscountType(e.target.value as 'fixed' | 'percentage')} style={{ maxWidth: 170 }}>
+                <option value="fixed">Fixed (\u20B9)</option>
+                <option value="percentage">Percentage (%)</option>
+              </select>
+              <input type="number" min={0} value={discountValue} onChange={(e) => setDiscountValue(Number(e.target.value))} style={{ maxWidth: 120 }} />
+              <span className="page-subtitle">= \u20B9{discountAmount}</span>
+            </div>
+          )}
+
+          {isPaid && discountAmount > 0 && (
+            <div className="bill-row"><span>Discount</span><span>-\u20B9{discountAmount}</span></div>
+          )}
+
+          <div className="bill-row"><span>GST ({taxRate}%)</span><span>\u20B9{taxAmount}</span></div>
+          <div className="bill-row total-row"><span>Grand Total</span><span>\u20B9{grandTotal}</span></div>
         </div>
 
         {!isPaid && (
-          <div className="flex items-center gap-2 flex-wrap">
-            <span>Discount:</span>
-            <select
-              value={discountType}
-              onChange={(e) => setDiscountType(e.target.value as 'fixed' | 'percentage')}
-              className="border rounded px-2 py-1"
-            >
-              <option value="fixed">Fixed ({'\u20B9'})</option>
-              <option value="percentage">Percentage (%)</option>
-            </select>
-            <input
-              type="number"
-              min={0}
-              value={discountValue}
-              onChange={(e) => setDiscountValue(Number(e.target.value))}
-              className="border rounded px-2 py-1 w-24"
-            />
-            <span className="text-gray-500">= {'\u20B9'}{discountAmount}</span>
-          </div>
-        )}
-        {isPaid && discountAmount > 0 && (
-          <div className="flex justify-between">
-            <span>Discount ({discountType === 'percentage' ? `${discountValue}%` : 'fixed'})</span>
-            <span>-{'\u20B9'}{discountAmount}</span>
-          </div>
-        )}
-
-        <div className="flex justify-between">
-          <span>GST ({taxRate}%)</span>
-          <span>{'\u20B9'}{taxAmount}</span>
-        </div>
-
-        <div className="flex justify-between font-bold text-lg border-t pt-2">
-          <span>Grand Total</span>
-          <span>{'\u20B9'}{grandTotal}</span>
-        </div>
-      </div>
-
-      {!isPaid && (
-        <div className="space-y-4 mb-4">
-          <div>
-            <label className="block font-semibold mb-2">Payment Method</label>
-            <div className="flex flex-wrap gap-3">
-              {(Object.entries(PAYMENT_METHOD_LABELS) as [PaymentMethod, string][]).map(
-                ([value, label]) => (
-                  <label key={value} className="flex items-center gap-1">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value={value}
-                      checked={paymentMethod === value}
-                      onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
-                    />
-                    {label}
-                  </label>
-                )
-              )}
+          <div className="card">
+            <label>Payment Method</label>
+            <div className="payment-options" style={{ marginBottom: '16px' }}>
+              {(Object.entries(PAYMENT_METHOD_LABELS) as [PaymentMethod, string][]).map(([value, label]) => (
+                <button key={value} type="button" className={`payment-option ${paymentMethod === value ? 'active' : ''}`} onClick={() => setPaymentMethod(value)}>
+                  {paymentIcons[value]}
+                  <span>{label}</span>
+                </button>
+              ))}
             </div>
+
+            <div className="form-group">
+              <label>Reference Number (optional)</label>
+              <input type="text" value={referenceNumber} onChange={(e) => setReferenceNumber(e.target.value)} placeholder="Transaction ID / Reference" />
+            </div>
+
+            <button onClick={handleRecordPayment} className="btn btn-primary btn-lg" style={{ width: '100%', marginTop: '4px' }}>
+              Record Payment
+            </button>
           </div>
+        )}
 
-          <div>
-            <label className="block font-semibold mb-1">Reference Number (optional)</label>
-            <input
-              type="text"
-              value={referenceNumber}
-              onChange={(e) => setReferenceNumber(e.target.value)}
-              placeholder="Transaction ID / Reference"
-              className="border rounded px-3 py-2 w-full"
-            />
+        {isPaid && (
+          <div className="card" style={{ display: 'grid', gap: '12px' }}>
+            <button onClick={handlePrintReceipt} className="btn btn-primary">Print Receipt</button>
+            <button onClick={handleDone} className="btn btn-secondary">Done</button>
           </div>
-
-          <button
-            onClick={handleRecordPayment}
-            className="w-full bg-green-600 text-white py-3 rounded-lg font-bold text-lg hover:bg-green-700"
-          >
-            Record Payment
-          </button>
-        </div>
-      )}
-
-      {isPaid && (
-        <div className="space-y-3">
-          <button
-            onClick={handlePrintReceipt}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700"
-          >
-            Print Receipt
-          </button>
-          <button
-            onClick={handleDone}
-            className="w-full bg-gray-600 text-white py-3 rounded-lg font-bold hover:bg-gray-700"
-          >
-            Done
-          </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

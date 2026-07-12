@@ -1,18 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Users } from 'lucide-react';
 import type { RestaurantTable } from '../../types/index.ts';
 import { TABLE_STATUS_LABELS } from '../../types/index.ts';
 import { tableRepository } from '../../repositories/tableRepository.ts';
 import { sessionRepository } from '../../repositories/sessionRepository.ts';
-
-const statusColors: Record<string, { bg: string; border: string }> = {
-  available: { bg: 'var(--status-available-bg)', border: 'var(--status-available)' },
-  occupied: { bg: 'var(--status-occupied-bg)', border: 'var(--status-occupied)' },
-  order_in_progress: { bg: 'var(--status-preparing-bg)', border: 'var(--status-preparing)' },
-  billing_requested: { bg: 'var(--status-billing-bg)', border: 'var(--status-billing)' },
-  paid: { bg: 'var(--status-paid-bg)', border: 'var(--status-paid)' },
-  ready_for_cleaning: { bg: 'var(--status-cleaning-bg)', border: 'var(--status-cleaning)' },
-};
 
 type TableFilter = 'all' | 'available' | 'occupied';
 
@@ -47,7 +40,6 @@ export default function TableDashboard() {
         tableId: table.id!,
         tableName: table.name,
         openedAt: new Date().toISOString(),
-        // Keep table available until at least one item is added.
         status: 'available',
       });
       await tableRepository.updateStatus(table.id!, 'available', sessionId);
@@ -64,9 +56,7 @@ export default function TableDashboard() {
     }
   }, [navigate, fetchTables]);
 
-  if (loading) {
-    return <div className="page-container"><p>Loading tables...</p></div>;
-  }
+  if (loading) return <div className="page-container"><p>Loading tables...</p></div>;
 
   const filteredTables = tables.filter((table) => {
     if (filter === 'all') return true;
@@ -76,13 +66,16 @@ export default function TableDashboard() {
 
   return (
     <div className="page-container">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', gap: '1rem', flexWrap: 'wrap' }}>
-        <h1>Tables</h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Tables</h1>
+          <p className="page-subtitle">Select a table to continue service workflow</p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <button className={`btn ${filter === 'all' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setFilter('all')}>All</button>
           <button className={`btn ${filter === 'occupied' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setFilter('occupied')}>Occupied</button>
           <button className={`btn ${filter === 'available' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setFilter('available')}>Available</button>
-          <button className="btn btn-secondary" onClick={() => navigate('/')}>Back</button>
+          <button className="btn btn-secondary" onClick={() => navigate('/')}><ArrowLeft size={16} />Back</button>
         </div>
       </div>
 
@@ -91,28 +84,22 @@ export default function TableDashboard() {
       ) : filteredTables.length === 0 ? (
         <p>No tables match this filter.</p>
       ) : (
-        <div className="grid">
+        <div className="table-grid">
           {filteredTables.map((table) => (
-            <div
+            <motion.div
               key={table.id}
-              className="card"
-              style={{
-                cursor: 'pointer',
-                textAlign: 'center',
-                background: statusColors[table.status]?.bg ?? 'var(--surface)',
-                borderColor: statusColors[table.status]?.border ?? 'var(--border)',
-                borderWidth: '2px',
-              }}
+              className={`card table-tile status-tint-${table.status}`}
               onClick={() => handleTableClick(table)}
+              whileHover={{ y: -4 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.22 }}
             >
-              <h2 style={{ marginBottom: '0.5rem' }}>{table.name}</h2>
-              <span className={`status-badge ${table.status}`}>
-                {TABLE_STATUS_LABELS[table.status] || table.status}
-              </span>
-              <p style={{ marginTop: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                Capacity: {table.capacity}
+              <h2>{table.name}</h2>
+              <span className={`status-badge ${table.status}`}>{TABLE_STATUS_LABELS[table.status] || table.status}</span>
+              <p className="page-subtitle" style={{ marginTop: '10px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <Users size={16} /> Capacity: {table.capacity}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
       )}
