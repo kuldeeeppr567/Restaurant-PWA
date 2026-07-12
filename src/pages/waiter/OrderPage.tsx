@@ -245,7 +245,6 @@ export default function OrderPage() {
     const { broad, sub } = splitCategory(menuItem.category);
     return broad === selectedBroadCategory && sub === selectedSubCategory;
   });
-  const getInstructions = (category: string) => getSpecialInstructionsForCategory(category);
 
   return (
     <div className="page-container">
@@ -362,7 +361,7 @@ export default function OrderPage() {
                 {draft && draft.quantity > 0 && (
                   <div style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid var(--border)' }}>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginBottom: '0.5rem' }}>
-                      {getInstructions(item.category).map((instr) => (
+                      {getSpecialInstructionsForCategory(item.category).map((instr) => (
                         <label key={instr} style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                           <input
                             type="checkbox"
