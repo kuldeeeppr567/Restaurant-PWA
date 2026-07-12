@@ -96,7 +96,7 @@ export default function TableDashboard() {
             >
               <h2>{table.name}</h2>
               <span className={`status-badge ${table.status}`}>{TABLE_STATUS_LABELS[table.status] || table.status}</span>
-              <p className="page-subtitle" style={{ marginTop: '10px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <p className="page-subtitle" style={{ marginTop: 'var(--spacing-1)', display: 'inline-flex', alignItems: 'center', gap: 'var(--spacing-1)' }}>
                 <Users size={16} /> Capacity: {table.capacity}
               </p>
             </motion.div>

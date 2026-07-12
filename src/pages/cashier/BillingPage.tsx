@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, CreditCard, Landmark, QrCode, Wallet } from 'lucide-react';
@@ -9,7 +9,7 @@ import { paymentRepository } from '../../repositories/paymentRepository.ts';
 import { PAYMENT_METHOD_LABELS } from '../../types/index.ts';
 import type { RestaurantTable, DiningSession, OrderItem, PaymentMethod } from '../../types/index.ts';
 
-const paymentIcons: Record<PaymentMethod, JSX.Element> = {
+const paymentIcons: Record<PaymentMethod, ReactNode> = {
   cash: <Wallet size={18} />,
   card: <CreditCard size={18} />,
   phonepe: <QrCode size={18} />,
@@ -149,7 +149,7 @@ export default function BillingPage() {
               >
                 <div className="text-left">
                   <div className="text-2xl font-bold">{table.name}</div>
-                  <div style={{ marginTop: 10 }} className={`status-badge ${table.status}`}>{table.status.replace(/_/g, ' ')}</div>
+                  <div style={{ marginTop: 'var(--spacing-1)' }} className={`status-badge ${table.status}`}>{table.status.replace(/_/g, ' ')}</div>
                 </div>
               </motion.button>
             ))}

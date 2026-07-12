@@ -7,6 +7,9 @@ import { orderRepository } from '../../repositories/orderRepository.ts';
 
 type FilterTab = 'all' | 'submitted' | 'preparing' | 'ready';
 
+const iconSize = 14;
+const tokenSpacing = 'var(--spacing-1)';
+
 function timeElapsed(isoDate: string): string {
   const diff = Math.floor((Date.now() - new Date(isoDate).getTime()) / 60000);
   if (diff < 1) return 'Just now';
@@ -63,7 +66,7 @@ export default function KitchenDisplay() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 'var(--spacing-1)', marginBottom: '20px', flexWrap: 'wrap' }}>
         {tabs.map((tab) => (
           <button key={tab.key} className={`btn ${filter === tab.key ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setFilter(tab.key)}>
             {tab.label}
@@ -82,14 +85,14 @@ export default function KitchenDisplay() {
                 <span className={`badge ${statusBadgeClass[item.status] || ''}`}>{ORDER_STATUS_LABELS[item.status]}</span>
               </div>
 
-              <p style={{ marginTop: '8px', fontSize: '1.2rem', fontWeight: 600 }}>{item.itemName}</p>
+              <p style={{ marginTop: 'var(--spacing-1)', fontSize: '1.2rem', fontWeight: 600 }}>{item.itemName}</p>
               <p className="page-subtitle">Qty: <strong>{item.quantity}</strong></p>
 
               {item.specialInstructions.length > 0 && (
                 <div className="kitchen-warning">
                   {item.specialInstructions.map((instr, idx) => (
-                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: idx ? '6px' : 0 }}>
-                      <CookingPot size={14} /> {instr}
+                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: tokenSpacing, marginTop: idx ? tokenSpacing : 0 }}>
+                      <CookingPot size={iconSize} /> {instr}
                     </div>
                   ))}
                 </div>
@@ -97,16 +100,16 @@ export default function KitchenDisplay() {
 
               {item.customNotes && (
                 <div className="kitchen-warning" style={{ background: 'rgba(124, 58, 237, 0.14)', color: '#5b21b6' }}>
-                  <StickyNote size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: '-2px' }} />
+                  <StickyNote size={iconSize} style={{ display: 'inline', marginRight: tokenSpacing, verticalAlign: '-2px' }} />
                   {item.customNotes}
                 </div>
               )}
 
               <div className="kitchen-item-meta">
-                <span className="page-subtitle" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Clock3 size={14} />{timeElapsed(item.orderedAt)}</span>
+                <span className="page-subtitle" style={{ display: 'inline-flex', alignItems: 'center', gap: tokenSpacing }}><Clock3 size={iconSize} />{timeElapsed(item.orderedAt)}</span>
               </div>
 
-              <div style={{ marginTop: '14px' }}>
+              <div style={{ marginTop: 'var(--spacing-2)' }}>
                 {item.status === 'submitted' && (
                   <button className="btn btn-primary" style={{ width: '100%' }} onClick={() => handleStatusChange(item.id!, 'preparing')}>
                     Start Preparing

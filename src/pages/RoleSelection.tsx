@@ -84,7 +84,7 @@ export default function RoleSelection() {
       </div>
 
       <p className="role-footer">
-        <CircleAlert size={16} style={{ display: 'inline', marginRight: 6, verticalAlign: '-2px' }} />
+        <CircleAlert size={16} style={{ display: 'inline', marginRight: "6px", verticalAlign: '-2px' }} />
         Demo mode: no authentication enabled.
       </p>
 
