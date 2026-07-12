@@ -89,7 +89,7 @@ const SPECIAL_INSTRUCTIONS_BY_CATEGORY: Record<string, string[]> = {
   'Global > Italian': ['Extra cheese', 'Less spicy', 'Extra spicy', 'No onion', 'No garlic', 'Well done'],
   'Global > Street Food': ['Extra crispy', 'Extra cheese', 'Less spicy', 'Extra spicy', 'No onion'],
   'Asian > Indo-Chinese': ['Less oil', 'Less spicy', 'Extra spicy', 'No onion', 'No garlic'],
-  'Beverages > Hot': ['Less sugar', 'No sugar', 'Extra Hot'],
+  'Beverages > Hot': ['Less sugar', 'No sugar', 'Extra hot'],
   'Beverages > Cold': ['Less sugar', 'No sugar', 'Less ice', 'No ice'],
   'Desserts > Indian': ['Less sugar'],
 };
