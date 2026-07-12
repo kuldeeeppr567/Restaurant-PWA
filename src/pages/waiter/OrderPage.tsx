@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { RestaurantTable, MenuItem, OrderItem, OrderItemStatus } from '../../types/index.ts';
-import { SPECIAL_INSTRUCTIONS, ORDER_STATUS_LABELS } from '../../types/index.ts';
+import { getSpecialInstructionsForCategory, ORDER_STATUS_LABELS } from '../../types/index.ts';
 import { tableRepository } from '../../repositories/tableRepository.ts';
 import { sessionRepository } from '../../repositories/sessionRepository.ts';
 import { menuRepository } from '../../repositories/menuRepository.ts';
@@ -40,6 +40,34 @@ export default function OrderPage() {
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>('');
   const [draftItems, setDraftItems] = useState<DraftItem[]>([]);
 
+  const ensureActiveSession = useCallback(async (restaurantTable: RestaurantTable) => {
+    if (!restaurantTable.id) return null;
+
+    const existingByCurrentId = restaurantTable.currentSessionId
+      ? await sessionRepository.getById(restaurantTable.currentSessionId)
+      : undefined;
+    const activeFromCurrentId = existingByCurrentId && !existingByCurrentId.closedAt
+      ? existingByCurrentId
+      : undefined;
+    const activeSession = activeFromCurrentId ?? await sessionRepository.getByTableId(restaurantTable.id);
+
+    if (activeSession?.id) {
+      if (restaurantTable.currentSessionId !== activeSession.id) {
+        await tableRepository.update(restaurantTable.id, { currentSessionId: activeSession.id });
+      }
+      return activeSession;
+    }
+
+    const nextSessionId = await sessionRepository.create({
+      tableId: restaurantTable.id,
+      tableName: restaurantTable.name,
+      openedAt: new Date().toISOString(),
+      status: restaurantTable.status,
+    });
+    await tableRepository.update(restaurantTable.id, { currentSessionId: nextSessionId });
+    return sessionRepository.getById(nextSessionId);
+  }, []);
+
   const syncTableStatusWithItems = useCallback(async (items: OrderItem[]) => {
     if (!table?.id || !sessionId) return;
     const activeItems = items.filter((item) => item.status !== 'cancelled');
@@ -60,20 +88,25 @@ export default function OrderPage() {
 
   const fetchData = useCallback(async () => {
     if (!tableId) return;
+    setLoading(true);
     const tid = parseInt(tableId, 10);
     const t = await tableRepository.getById(tid);
-    setTable(t ?? null);
-
-    if (t) {
-      const session = await sessionRepository.getByTableId(tid);
-      if (session?.id) {
-        setSessionId(session.id);
-        const items = await orderRepository.getBySessionId(session.id);
-        setOrderItems(items);
-      }
+    if (!t) {
+      setTable(null);
+      setSessionId(null);
+      setOrderItems([]);
+      setLoading(false);
+      return;
     }
+
+    const session = await ensureActiveSession(t);
+    const items = session?.id ? await orderRepository.getBySessionId(session.id) : [];
+
+    setTable({ ...t, currentSessionId: session?.id });
+    setSessionId(session?.id ?? null);
+    setOrderItems(items);
     setLoading(false);
-  }, [tableId]);
+  }, [tableId, ensureActiveSession]);
 
   useEffect(() => {
     fetchData();
@@ -212,6 +245,7 @@ export default function OrderPage() {
     const { broad, sub } = splitCategory(menuItem.category);
     return broad === selectedBroadCategory && sub === selectedSubCategory;
   });
+  const getInstructions = (category: string) => getSpecialInstructionsForCategory(category);
 
   return (
     <div className="page-container">
@@ -328,7 +362,7 @@ export default function OrderPage() {
                 {draft && draft.quantity > 0 && (
                   <div style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid var(--border)' }}>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginBottom: '0.5rem' }}>
-                      {SPECIAL_INSTRUCTIONS.map((instr) => (
+                      {getInstructions(item.category).map((instr) => (
                         <label key={instr} style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                           <input
                             type="checkbox"

@@ -81,17 +81,22 @@ export interface Payment {
   paidAt: string;
 }
 
-export const SPECIAL_INSTRUCTIONS = [
-  'Less oil',
-  'Extra cheese',
-  'No onion',
-  'Less spicy',
-  'Extra crispy',
-  'Extra spicy',
-  'No garlic',
-  'Extra butter',
-  'Well done',
-];
+const DEFAULT_SPECIAL_INSTRUCTIONS = ['Less spicy', 'No onion'];
+
+const SPECIAL_INSTRUCTIONS_BY_CATEGORY: Record<string, string[]> = {
+  'Indian > South Indian': ['Extra crispy', 'Less oil', 'Less spicy', 'Extra spicy', 'No onion'],
+  'Indian > North Indian': ['Less oil', 'Less spicy', 'Extra spicy', 'No onion', 'No garlic', 'Extra butter'],
+  'Global > Italian': ['Extra cheese', 'Less spicy', 'Extra spicy', 'No onion', 'No garlic', 'Well done'],
+  'Global > Street Food': ['Extra crispy', 'Extra cheese', 'Less spicy', 'Extra spicy', 'No onion'],
+  'Asian > Indo-Chinese': ['Less oil', 'Less spicy', 'Extra spicy', 'No onion', 'No garlic'],
+  'Beverages > Hot': ['Less sugar', 'No sugar', 'Extra hot'],
+  'Beverages > Cold': ['Less sugar', 'No sugar', 'Less ice', 'No ice'],
+  'Desserts > Indian': ['Less sugar'],
+};
+
+export function getSpecialInstructionsForCategory(category: string): string[] {
+  return SPECIAL_INSTRUCTIONS_BY_CATEGORY[category] ?? DEFAULT_SPECIAL_INSTRUCTIONS;
+}
 
 export const SERVICE_REQUEST_LABELS: Record<ServiceRequestType, string> = {
   chutney: 'Chutney Refill',

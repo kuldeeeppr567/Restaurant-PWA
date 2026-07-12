@@ -2,10 +2,10 @@ import { type ReactNode } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  ArrowLeft,
   BarChart3,
   Bell,
   ChefHat,
+  House,
   LayoutGrid,
   Receipt,
   Settings2,
@@ -75,8 +75,8 @@ export default function AppLayout({ children, role }: AppLayoutProps) {
 
         <div className="sidebar-footer">
           <NavLink to="/">
-            <ArrowLeft size={18} />
-            Change Role
+            <House size={18} />
+            Home
           </NavLink>
         </div>
       </aside>
@@ -103,6 +103,10 @@ export default function AppLayout({ children, role }: AppLayoutProps) {
             {item.label}
           </NavLink>
         ))}
+        <NavLink to="/">
+          <span className="nav-icon"><House size={18} /></span>
+          Home
+        </NavLink>
       </nav>
     </div>
   );
