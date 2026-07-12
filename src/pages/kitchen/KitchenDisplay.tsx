@@ -1,9 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import { Clock3, CookingPot, StickyNote } from 'lucide-react';
 import type { OrderItem, OrderItemStatus } from '../../types/index.ts';
 import { ORDER_STATUS_LABELS } from '../../types/index.ts';
 import { orderRepository } from '../../repositories/orderRepository.ts';
 
 type FilterTab = 'all' | 'submitted' | 'preparing' | 'ready';
+
+const iconSize = 14;
+const tokenSpacing = 'var(--spacing-1)';
 
 function timeElapsed(isoDate: string): string {
   const diff = Math.floor((Date.now() - new Date(isoDate).getTime()) / 60000);
@@ -54,87 +59,70 @@ export default function KitchenDisplay() {
 
   return (
     <div className="page-container">
-      <h1 style={{ marginBottom: '1rem' }}>Kitchen Display</h1>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Kitchen Queue</h1>
+          <p className="page-subtitle">Track preparation in real time</p>
+        </div>
+      </div>
 
-      {/* Filter tabs */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', gap: 'var(--spacing-1)', marginBottom: '20px', flexWrap: 'wrap' }}>
         {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            className={`btn ${filter === tab.key ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setFilter(tab.key)}
-            style={{ fontSize: '1.1rem', padding: '0.75rem 1.25rem' }}
-          >
+          <button key={tab.key} className={`btn ${filter === tab.key ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setFilter(tab.key)}>
             {tab.label}
           </button>
         ))}
       </div>
 
       {filtered.length === 0 ? (
-        <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem' }}>No items in queue.</p>
+        <p className="page-subtitle">No items in queue.</p>
       ) : (
-        <div className="grid">
+        <div className="kitchen-grid">
           {filtered.map((item) => (
-            <div key={item.id} className="card kitchen-card" style={{ padding: '1.5rem' }}>
-              <div style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '0.25rem' }}>
-                Table {item.tableId}
-              </div>
-              <div style={{ fontSize: '1.6rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-                {item.itemName}
-              </div>
-              <div style={{ fontSize: '1.3rem', marginBottom: '0.5rem' }}>
-                Qty: <strong>{item.quantity}</strong>
+            <motion.div key={item.id} className="card kitchen-card" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.24 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ fontSize: '1.3rem', fontWeight: 700 }}>Table {item.tableId}</h3>
+                <span className={`badge ${statusBadgeClass[item.status] || ''}`}>{ORDER_STATUS_LABELS[item.status]}</span>
               </div>
 
+              <p style={{ marginTop: 'var(--spacing-1)', fontSize: '1.2rem', fontWeight: 600 }}>{item.itemName}</p>
+              <p className="page-subtitle">Qty: <strong>{item.quantity}</strong></p>
+
               {item.specialInstructions.length > 0 && (
-                <div style={{ marginBottom: '0.5rem', padding: '0.5rem', background: 'var(--warning-bg, #fff3cd)', borderRadius: '4px' }}>
+                <div className="kitchen-warning">
                   {item.specialInstructions.map((instr, idx) => (
-                    <div key={idx} style={{ fontSize: '1rem', fontWeight: 600 }}>⚠️ {instr}</div>
+                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: tokenSpacing, marginTop: idx ? tokenSpacing : 0 }}>
+                      <CookingPot size={iconSize} /> {instr}
+                    </div>
                   ))}
                 </div>
               )}
 
               {item.customNotes && (
-                <div style={{ fontSize: '0.95rem', fontStyle: 'italic', marginBottom: '0.5rem' }}>
-                  📝 {item.customNotes}
+                <div className="kitchen-warning" style={{ background: 'rgba(124, 58, 237, 0.14)', color: '#5b21b6' }}>
+                  <StickyNote size={iconSize} style={{ display: 'inline', marginRight: tokenSpacing, verticalAlign: '-2px' }} />
+                  {item.customNotes}
                 </div>
               )}
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
-                <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                  {timeElapsed(item.orderedAt)}
-                </span>
-                <span className={`badge ${statusBadgeClass[item.status] || ''}`}>
-                  {ORDER_STATUS_LABELS[item.status]}
-                </span>
+              <div className="kitchen-item-meta">
+                <span className="page-subtitle" style={{ display: 'inline-flex', alignItems: 'center', gap: tokenSpacing }}><Clock3 size={iconSize} />{timeElapsed(item.orderedAt)}</span>
               </div>
 
-              <div style={{ marginTop: '1rem' }}>
+              <div style={{ marginTop: 'var(--spacing-2)' }}>
                 {item.status === 'submitted' && (
-                  <button
-                    className="btn btn-primary"
-                    style={{ width: '100%', fontSize: '1.1rem', padding: '0.75rem' }}
-                    onClick={() => handleStatusChange(item.id!, 'preparing')}
-                  >
+                  <button className="btn btn-primary" style={{ width: '100%' }} onClick={() => handleStatusChange(item.id!, 'preparing')}>
                     Start Preparing
                   </button>
                 )}
                 {item.status === 'preparing' && (
-                  <button
-                    className="btn btn-success"
-                    style={{ width: '100%', fontSize: '1.1rem', padding: '0.75rem' }}
-                    onClick={() => handleStatusChange(item.id!, 'ready')}
-                  >
+                  <button className="btn btn-success" style={{ width: '100%' }} onClick={() => handleStatusChange(item.id!, 'ready')}>
                     Mark Ready
                   </button>
                 )}
-                {item.status === 'ready' && (
-                  <p style={{ textAlign: 'center', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
-                    Waiting for waiter to serve
-                  </p>
-                )}
+                {item.status === 'ready' && <p className="page-subtitle" style={{ textAlign: 'center' }}>Waiting for waiter to serve</p>}
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       )}

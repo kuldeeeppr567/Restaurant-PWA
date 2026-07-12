@@ -1,20 +1,22 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { BarChart3, ChefHat, CircleAlert, Receipt, UtensilsCrossed, Wallet } from 'lucide-react';
 import { loadDemoData, resetDemoData } from '../db/seedData.ts';
 import { useOnlineStatus } from '../hooks/useOnlineStatus.ts';
 
 interface RoleCard {
   role: string;
-  icon: string;
+  icon: ReactNode;
   description: string;
   path: string;
 }
 
 const roles: RoleCard[] = [
-  { role: 'Waiter', icon: '🍽️', description: 'Take orders and serve tables', path: '/waiter/tables' },
-  { role: 'Kitchen', icon: '👨‍🍳', description: 'Manage food preparation', path: '/kitchen' },
-  { role: 'Cashier', icon: '💰', description: 'Handle billing and payments', path: '/cashier' },
-  { role: 'Owner/Admin', icon: '📊', description: 'Menu management and analytics', path: '/admin/menu' },
+  { role: 'Waiter', icon: <UtensilsCrossed size={22} />, description: 'Take orders and serve tables', path: '/waiter/tables' },
+  { role: 'Kitchen', icon: <ChefHat size={22} />, description: 'Manage food preparation', path: '/kitchen' },
+  { role: 'Cashier', icon: <Wallet size={22} />, description: 'Handle billing and payments', path: '/cashier' },
+  { role: 'Owner/Admin', icon: <BarChart3 size={22} />, description: 'Menu management and analytics', path: '/admin/menu' },
 ];
 
 export default function RoleSelection() {
@@ -49,43 +51,44 @@ export default function RoleSelection() {
   }, []);
 
   return (
-    <div className="page-container" style={{ textAlign: 'center', padding: '2rem' }}>
-      <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
-        🍽️ Restaurant POS
-      </h1>
+    <div className="page-container">
+      <div className="role-hero">
+        <div className="role-logo"><Receipt size={28} /></div>
+        <h1 className="page-title">Restaurant POS</h1>
+        <p className="page-subtitle">Premium command center for service, kitchen, and billing workflows</p>
+        <p style={{ marginTop: '10px' }}>
+          <span className={isOnline ? 'online-indicator' : 'offline-indicator'}>
+            {isOnline ? 'Live sync available' : 'Offline mode active'}
+          </span>
+        </p>
+      </div>
 
-      <p style={{ marginBottom: '2rem', color: 'var(--text-secondary)' }}>
-        {isOnline ? '🟢 Online' : '🔴 Offline'}
-      </p>
-
-      <div
-        style={{
-          maxWidth: '600px',
-          margin: '0 auto 2rem',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-          gap: '1rem',
-        }}
-      >
+      <div className="role-grid">
         {roles.map((r) => (
-          <div
+          <motion.div
             key={r.role}
-            className="card"
-            style={{ cursor: 'pointer', textAlign: 'center', padding: '1.5rem' }}
+            className="card role-card"
             onClick={() => navigate(r.path)}
+            whileHover={{ y: -4 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ duration: 0.2 }}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && navigate(r.path)}
           >
-            <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{r.icon}</div>
-            <h2 style={{ marginBottom: '0.25rem' }}>{r.role}</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{r.description}</p>
-          </div>
+            <div className="role-icon">{r.icon}</div>
+            <h2>{r.role}</h2>
+            <p className="page-subtitle">{r.description}</p>
+          </motion.div>
         ))}
       </div>
 
-      <p style={{ color: 'var(--warning)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-        ⚠️ Demo Mode - No authentication. Select a role to continue.
+      <p className="role-footer">
+        <CircleAlert size={16} style={{ display: 'inline', marginRight: "6px", verticalAlign: '-2px' }} />
+        Demo mode: no authentication enabled.
       </p>
 
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
         <button className="btn btn-primary" onClick={handleLoadDemo} disabled={loading}>
           {loading ? 'Loading...' : 'Load Demo Data'}
         </button>
