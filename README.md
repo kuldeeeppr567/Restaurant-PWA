@@ -1,10 +1,10 @@
-# Dosa Restaurant POS
+# Restaurant POS
 
-> A Progressive Web App for managing a dosa restaurant
+> A Progressive Web App for managing a restaurant
 
 ## Business Problem
 
-A small Indian dosa restaurant offering 40+ dosa varieties currently manages everything with pen and paper. This PWA digitizes the entire workflow: table management, order-taking, kitchen communication, serving, refills, and billing -- replacing manual processes with an efficient digital system that runs on any device with a browser.
+A small restaurant currently manages everything with pen and paper. This PWA digitizes the entire workflow: table management, order-taking, kitchen communication, serving, refills, and billing -- replacing manual processes with an efficient digital system that runs on any device with a browser.
 
 ## Application Features
 
@@ -158,7 +158,7 @@ Never include secret keys in frontend code.
 Use **Load Demo Data** from the home screen or Settings to populate the app with sample data:
 
 - 10 restaurant tables
-- 48 menu items across 10 categories
+- Multi-cuisine demo menu with broad and sub-categories
 - Active orders in various statuses
 - Pending service requests
 - 15 historical completed orders for analytics

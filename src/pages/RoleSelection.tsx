@@ -51,14 +51,22 @@ export default function RoleSelection() {
   return (
     <div className="page-container" style={{ textAlign: 'center', padding: '2rem' }}>
       <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
-        🫓 Dosa Restaurant POS
+        🍽️ Restaurant POS
       </h1>
 
       <p style={{ marginBottom: '2rem', color: 'var(--text-secondary)' }}>
         {isOnline ? '🟢 Online' : '🔴 Offline'}
       </p>
 
-      <div className="grid" style={{ maxWidth: '600px', margin: '0 auto 2rem' }}>
+      <div
+        style={{
+          maxWidth: '600px',
+          margin: '0 auto 2rem',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+          gap: '1rem',
+        }}
+      >
         {roles.map((r) => (
           <div
             key={r.role}

@@ -60,7 +60,7 @@ export default function ReceiptPage() {
 
       <div className="receipt border p-6 text-sm">
         <div className="text-center mb-4">
-          <h1 className="text-xl font-bold">Dosa Delight Restaurant</h1>
+          <h1 className="text-xl font-bold">Restaurant POS</h1>
           <p className="text-gray-500">
             {paidDate.toLocaleDateString()} {paidDate.toLocaleTimeString()}
           </p>

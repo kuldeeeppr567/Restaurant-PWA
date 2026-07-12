@@ -1,23 +1,23 @@
 /* ===== CSS Custom Properties ===== */
 :root {
-  --primary: #e65100;
-  --primary-light: #ff833a;
-  --primary-dark: #ac1900;
-  --secondary: #ff9800;
-  --secondary-light: #ffc947;
-  --secondary-dark: #c66900;
-  --background: #fafafa;
+  --primary: #0a84ff;
+  --primary-light: #5ac8fa;
+  --primary-dark: #0060df;
+  --secondary: #34c759;
+  --secondary-light: #66d683;
+  --secondary-dark: #1f9e43;
+  --background: #f2f2f7;
   --surface: #ffffff;
-  --surface-variant: #f5f5f5;
-  --text-primary: #212121;
-  --text-secondary: #616161;
+  --surface-variant: #f7f8fb;
+  --text-primary: #1c1c1e;
+  --text-secondary: #636366;
   --text-on-primary: #ffffff;
   --text-on-secondary: #000000;
-  --border: #e0e0e0;
-  --shadow: rgba(0, 0, 0, 0.12);
-  --shadow-md: rgba(0, 0, 0, 0.2);
-  --radius: 8px;
-  --radius-lg: 12px;
+  --border: #d1d1d6;
+  --shadow: rgba(17, 17, 26, 0.08);
+  --shadow-md: rgba(17, 17, 26, 0.16);
+  --radius: 12px;
+  --radius-lg: 18px;
   --radius-sm: 4px;
   --nav-height: 64px;
   --sidebar-width: 240px;
@@ -34,24 +34,24 @@
   --touch-min: 44px;
 
   /* Status colors */
-  --status-available: #2e7d32;
-  --status-available-bg: #e8f5e9;
-  --status-occupied: #1565c0;
-  --status-occupied-bg: #e3f2fd;
-  --status-preparing: #e65100;
+  --status-available: #34c759;
+  --status-available-bg: #eaf9ef;
+  --status-occupied: #ff9f0a;
+  --status-occupied-bg: #fff4e6;
+  --status-preparing: #ff9500;
   --status-preparing-bg: #fff3e0;
-  --status-ready: #2e7d32;
-  --status-ready-bg: #e8f5e9;
-  --status-served: #616161;
-  --status-served-bg: #f5f5f5;
-  --status-cancelled: #c62828;
-  --status-cancelled-bg: #ffebee;
-  --status-billing: #6a1b9a;
-  --status-billing-bg: #f3e5f5;
-  --status-paid: #00695c;
-  --status-paid-bg: #e0f2f1;
-  --status-cleaning: #f9a825;
-  --status-cleaning-bg: #fffde7;
+  --status-ready: #30d158;
+  --status-ready-bg: #ebfbee;
+  --status-served: #8e8e93;
+  --status-served-bg: #f4f4f6;
+  --status-cancelled: #ff3b30;
+  --status-cancelled-bg: #ffeceb;
+  --status-billing: #af52de;
+  --status-billing-bg: #f7ebfd;
+  --status-paid: #32ade6;
+  --status-paid-bg: #e7f6ff;
+  --status-cleaning: #ffd60a;
+  --status-cleaning-bg: #fffce8;
 }
 
 /* ===== Reset ===== */
@@ -324,6 +324,15 @@ a {
   background: #1b5e20;
 }
 
+.btn-warning {
+  background: var(--status-occupied);
+  color: #1c1c1e;
+}
+
+.btn-warning:hover:not(:disabled) {
+  background: #e08900;
+}
+
 .btn-lg {
   min-height: 56px;
   padding: var(--spacing-md) var(--spacing-xl);
@@ -383,6 +392,20 @@ label {
   margin-bottom: var(--spacing-md);
 }
 
+/* ===== Common Utility Layout ===== */
+.page-container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--spacing-md);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+}
+
 /* ===== Table Grid ===== */
 .table-grid {
   display: grid;
@@ -424,10 +447,16 @@ label {
 .status-badge.cancelled::before { background: var(--status-cancelled); }
 .status-badge.billing { color: var(--status-billing); background: var(--status-billing-bg); }
 .status-badge.billing::before { background: var(--status-billing); }
+.status-badge.order_in_progress { color: var(--status-preparing); background: var(--status-preparing-bg); }
+.status-badge.order_in_progress::before { background: var(--status-preparing); }
+.status-badge.billing_requested { color: var(--status-billing); background: var(--status-billing-bg); }
+.status-badge.billing_requested::before { background: var(--status-billing); }
 .status-badge.paid { color: var(--status-paid); background: var(--status-paid-bg); }
 .status-badge.paid::before { background: var(--status-paid); }
 .status-badge.cleaning { color: var(--status-cleaning); background: var(--status-cleaning-bg); }
 .status-badge.cleaning::before { background: var(--status-cleaning); }
+.status-badge.ready_for_cleaning { color: var(--status-cleaning); background: var(--status-cleaning-bg); }
+.status-badge.ready_for_cleaning::before { background: var(--status-cleaning); }
 
 /* ===== Modal / Dialog ===== */
 .modal-overlay {

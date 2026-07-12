@@ -94,21 +94,18 @@ export default function BillingPage() {
       paidAt: new Date().toISOString(),
     });
 
-    await sessionRepository.update(session.id, { status: 'paid' });
-    await tableRepository.updateStatus(selectedTable.id, 'paid');
+    const closedAt = new Date().toISOString();
+    await sessionRepository.update(session.id, { status: 'paid', closedAt });
+    await tableRepository.resetTable(selectedTable.id);
     setIsPaid(true);
     await loadTables();
   };
 
-  const handleCloseTable = async () => {
-    if (!session?.id || !selectedTable?.id) return;
-    await sessionRepository.close(session.id);
-    await tableRepository.resetTable(selectedTable.id);
+  const handleDone = () => {
     setSelectedTable(null);
     setSession(null);
     setOrderItems([]);
     setIsPaid(false);
-    await loadTables();
   };
 
   const handlePrintReceipt = () => {
@@ -280,10 +277,10 @@ export default function BillingPage() {
             Print Receipt
           </button>
           <button
-            onClick={handleCloseTable}
+            onClick={handleDone}
             className="w-full bg-gray-600 text-white py-3 rounded-lg font-bold hover:bg-gray-700"
           >
-            Close Table
+            Done
           </button>
         </div>
       )}
