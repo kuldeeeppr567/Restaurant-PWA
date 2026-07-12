@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loadDemoData, resetDemoData } from '../db/seedData.ts';
+import { useOnlineStatus } from '../hooks/useOnlineStatus.ts';
 
 interface RoleCard {
   role: string;
@@ -18,19 +19,8 @@ const roles: RoleCard[] = [
 
 export default function RoleSelection() {
   const navigate = useNavigate();
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const isOnline = useOnlineStatus();
   const [loading, setLoading] = useState(false);
-
-  useState(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  });
 
   const handleLoadDemo = useCallback(async () => {
     if (!window.confirm('Load demo data? This will replace all existing data.')) return;

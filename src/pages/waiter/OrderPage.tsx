@@ -99,20 +99,19 @@ export default function OrderPage() {
   const addToOrder = useCallback(async () => {
     if (!sessionId || draftItems.length === 0) return;
     const now = new Date().toISOString();
-    for (const draft of draftItems) {
-      await orderRepository.create({
-        sessionId,
-        tableId: parseInt(tableId!, 10),
-        menuItemId: draft.menuItem.id!,
-        itemName: draft.menuItem.name,
-        priceSnapshot: draft.menuItem.price,
-        quantity: draft.quantity,
-        specialInstructions: draft.specialInstructions,
-        customNotes: draft.customNotes,
-        status: 'draft',
-        orderedAt: now,
-      });
-    }
+    const items = draftItems.map((draft) => ({
+      sessionId,
+      tableId: parseInt(tableId!, 10),
+      menuItemId: draft.menuItem.id!,
+      itemName: draft.menuItem.name,
+      priceSnapshot: draft.menuItem.price,
+      quantity: draft.quantity,
+      specialInstructions: draft.specialInstructions,
+      customNotes: draft.customNotes,
+      status: 'draft' as const,
+      orderedAt: now,
+    }));
+    await orderRepository.bulkCreate(items);
     setShowPicker(false);
     setDraftItems([]);
     fetchData();

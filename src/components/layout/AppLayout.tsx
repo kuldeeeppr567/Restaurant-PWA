@@ -17,7 +17,7 @@ interface NavItem {
 const navItemsByRole: Record<AppRole, NavItem[]> = {
   waiter: [
     { to: '/waiter/tables', icon: '🍽️', label: 'Tables' },
-    { to: '/waiter/requests', icon: '🔔', label: 'Service Requests' },
+    { to: '/waiter/service', icon: '🔔', label: 'Service Requests' },
   ],
   kitchen: [
     { to: '/kitchen', icon: '👨‍🍳', label: 'Kitchen Queue' },

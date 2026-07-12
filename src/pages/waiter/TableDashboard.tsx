@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { RestaurantTable } from '../../types/index.ts';
+import { TABLE_STATUS_LABELS } from '../../types/index.ts';
 import { tableRepository } from '../../repositories/tableRepository.ts';
 import { sessionRepository } from '../../repositories/sessionRepository.ts';
 
@@ -11,15 +12,6 @@ const statusColors: Record<string, string> = {
   billing_requested: 'badge-info',
   paid: 'badge-success',
   ready_for_cleaning: 'badge-danger',
-};
-
-const statusLabels: Record<string, string> = {
-  available: 'Available',
-  occupied: 'Occupied',
-  order_in_progress: 'Order In Progress',
-  billing_requested: 'Billing Requested',
-  paid: 'Paid',
-  ready_for_cleaning: 'Ready for Cleaning',
 };
 
 export default function TableDashboard() {
@@ -86,7 +78,7 @@ export default function TableDashboard() {
             >
               <h2 style={{ marginBottom: '0.5rem' }}>{table.name}</h2>
               <span className={`badge ${statusColors[table.status] || ''}`}>
-                {statusLabels[table.status] || table.status}
+                {TABLE_STATUS_LABELS[table.status] || table.status}
               </span>
               <p style={{ marginTop: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                 Capacity: {table.capacity}
