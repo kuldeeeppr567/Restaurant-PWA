@@ -13,62 +13,59 @@ import {
 } from 'lucide-react';
 import type { AppRole } from '../../types/index.ts';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus.ts';
+import { useLanguage } from '../../hooks/useLanguage.ts';
 
 interface AppLayoutProps {
   children: ReactNode;
   role: AppRole;
 }
 
-interface NavItem {
-  to: string;
-  icon: ReactNode;
-  label: string;
-}
-
-const navItemsByRole: Record<AppRole, NavItem[]> = {
-  waiter: [
-    { to: '/waiter/tables', icon: <LayoutGrid size={18} />, label: 'Tables' },
-    { to: '/waiter/service', icon: <Bell size={18} />, label: 'Service' },
-  ],
-  kitchen: [{ to: '/kitchen', icon: <ChefHat size={18} />, label: 'Kitchen Queue' }],
-  cashier: [{ to: '/cashier', icon: <Receipt size={18} />, label: 'Billing' }],
+const navIconsByRole: Record<AppRole, ReactNode[]> = {
+  waiter: [<LayoutGrid size={18} />, <Bell size={18} />],
+  kitchen: [<ChefHat size={18} />],
+  cashier: [<Receipt size={18} />],
   admin: [
-    { to: '/admin/menu', icon: <UtensilsCrossed size={18} />, label: 'Menu' },
-    { to: '/admin/tables', icon: <LayoutGrid size={18} />, label: 'Tables' },
-    { to: '/admin/analytics', icon: <BarChart3 size={18} />, label: 'Analytics' },
-    { to: '/admin/settings', icon: <Settings2 size={18} />, label: 'Settings' },
+    <UtensilsCrossed size={18} />,
+    <LayoutGrid size={18} />,
+    <BarChart3 size={18} />,
+    <Settings2 size={18} />,
   ],
 };
 
-const roleLabels: Record<AppRole, string> = {
-  waiter: 'Waiter Console',
-  kitchen: 'Kitchen Console',
-  cashier: 'Cashier Console',
-  admin: 'Admin Console',
+const navPathsByRole: Record<AppRole, string[]> = {
+  waiter: ['/waiter/tables', '/waiter/service'],
+  kitchen: ['/kitchen'],
+  cashier: ['/cashier'],
+  admin: ['/admin/menu', '/admin/tables', '/admin/analytics', '/admin/settings'],
 };
 
 export default function AppLayout({ children, role }: AppLayoutProps) {
   const location = useLocation();
   const online = useOnlineStatus();
-  const navItems = navItemsByRole[role];
+  const { t } = useLanguage();
+
+  const roleLabel = t.appLayout.roleLabels[role];
+  const navLabels = t.appLayout.navItems[role].map((item) => item.label);
+  const navIcons = navIconsByRole[role];
+  const navPaths = navPathsByRole[role];
 
   return (
     <div className="app-layout">
       <aside className="sidebar">
         <div className="sidebar-header">
           <div className="sidebar-brand">
-            <h2>{roleLabels[role]}</h2>
+            <h2>{roleLabel}</h2>
           </div>
           <span className={online ? 'online-indicator' : 'offline-indicator'}>
-            {online ? 'Online' : 'Offline'}
+            {online ? t.common.online : t.common.offline}
           </span>
         </div>
 
         <nav className="sidebar-nav">
-          {navItems.map((item) => (
-            <NavLink key={item.to} to={item.to}>
-              <span className="nav-icon">{item.icon}</span>
-              {item.label}
+          {navPaths.map((path, idx) => (
+            <NavLink key={path} to={path}>
+              <span className="nav-icon">{navIcons[idx]}</span>
+              {navLabels[idx]}
             </NavLink>
           ))}
         </nav>
@@ -76,7 +73,7 @@ export default function AppLayout({ children, role }: AppLayoutProps) {
         <div className="sidebar-footer">
           <NavLink to="/">
             <House size={18} />
-            Home
+            {t.common.home}
           </NavLink>
         </div>
       </aside>
@@ -97,15 +94,15 @@ export default function AppLayout({ children, role }: AppLayoutProps) {
       </main>
 
       <nav className="bottom-nav" aria-label="Main navigation">
-        {navItems.map((item) => (
-          <NavLink key={item.to} to={item.to}>
-            <span className="nav-icon">{item.icon}</span>
-            {item.label}
+        {navPaths.map((path, idx) => (
+          <NavLink key={path} to={path}>
+            <span className="nav-icon">{navIcons[idx]}</span>
+            {navLabels[idx]}
           </NavLink>
         ))}
         <NavLink to="/">
           <span className="nav-icon"><House size={18} /></span>
-          Home
+          {t.common.home}
         </NavLink>
       </nav>
     </div>

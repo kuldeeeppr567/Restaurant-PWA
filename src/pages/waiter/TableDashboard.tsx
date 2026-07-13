@@ -2,15 +2,16 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Users } from 'lucide-react';
-import type { RestaurantTable } from '../../types/index.ts';
-import { TABLE_STATUS_LABELS } from '../../types/index.ts';
+import type { RestaurantTable, TableStatus } from '../../types/index.ts';
 import { tableRepository } from '../../repositories/tableRepository.ts';
 import { sessionRepository } from '../../repositories/sessionRepository.ts';
+import { useLanguage } from '../../hooks/useLanguage.ts';
 
 type TableFilter = 'all' | 'available' | 'occupied';
 
 export default function TableDashboard() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [tables, setTables] = useState<RestaurantTable[]>([]);
   const [filter, setFilter] = useState<TableFilter>('all');
   const [loading, setLoading] = useState(true);
@@ -47,16 +48,16 @@ export default function TableDashboard() {
     } else if (table.status === 'occupied' || table.status === 'order_in_progress') {
       navigate(`/waiter/table/${table.id}`);
     } else if (table.status === 'billing_requested') {
-      alert('Billing has been requested for this table.');
+      alert(t.tableDashboard.billingAlert);
     } else if (table.status === 'ready_for_cleaning') {
-      if (window.confirm(`Mark ${table.name} as available?`)) {
+      if (window.confirm(t.tableDashboard.confirmMark(table.name))) {
         await tableRepository.resetTable(table.id!);
         fetchTables();
       }
     }
-  }, [navigate, fetchTables]);
+  }, [navigate, fetchTables, t]);
 
-  if (loading) return <div className="page-container"><p>Loading tables...</p></div>;
+  if (loading) return <div className="page-container"><p>{t.common.loading}</p></div>;
 
   const filteredTables = tables.filter((table) => {
     if (filter === 'all') return true;
@@ -68,39 +69,46 @@ export default function TableDashboard() {
     <div className="page-container">
       <div className="page-header">
         <div>
-          <h1 className="page-title">Tables</h1>
-          <p className="page-subtitle">Select a table to continue service workflow</p>
+          <h1 className="page-title">{t.tableDashboard.title}</h1>
+          <p className="page-subtitle">{t.tableDashboard.subtitle}</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-          <button className={`btn ${filter === 'all' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setFilter('all')}>All</button>
-          <button className={`btn ${filter === 'occupied' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setFilter('occupied')}>Occupied</button>
-          <button className={`btn ${filter === 'available' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setFilter('available')}>Available</button>
-          <button className="btn btn-secondary" onClick={() => navigate('/')}><ArrowLeft size={16} />Back</button>
+          <button className={`btn ${filter === 'all' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setFilter('all')}>{t.common.all}</button>
+          <button className={`btn ${filter === 'occupied' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setFilter('occupied')}>{t.tableDashboard.filterOccupied}</button>
+          <button className={`btn ${filter === 'available' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setFilter('available')}>{t.tableDashboard.filterAvailable}</button>
+          <button className="btn btn-secondary" onClick={() => navigate('/')}><ArrowLeft size={16} />{t.common.back}</button>
         </div>
       </div>
 
       {tables.length === 0 ? (
-        <p>No tables found. Load demo data from the home page.</p>
+        <p>{t.tableDashboard.noTables}</p>
       ) : filteredTables.length === 0 ? (
-        <p>No tables match this filter.</p>
+        <p>{t.tableDashboard.noMatch}</p>
       ) : (
         <div className="table-grid">
-          {filteredTables.map((table) => (
-            <motion.div
-              key={table.id}
-              className={`card table-tile status-tint-${table.status}`}
-              onClick={() => handleTableClick(table)}
-              whileHover={{ y: -4 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.22 }}
-            >
-              <h2>{table.name}</h2>
-              <span className={`status-badge ${table.status}`}>{TABLE_STATUS_LABELS[table.status] || table.status}</span>
-              <p className="page-subtitle" style={{ marginTop: 'var(--spacing-1)', display: 'inline-flex', alignItems: 'center', gap: 'var(--spacing-1)' }}>
-                <Users size={16} /> Capacity: {table.capacity}
-              </p>
-            </motion.div>
-          ))}
+          {filteredTables.map((table) => {
+            const statusClass = (table.status as string).replace(/_/g, '-').toLowerCase();
+            const statusLabel = t.tableStatus[table.status as TableStatus] ?? table.status;
+            return (
+              <motion.div
+                key={table.id}
+                className={`card table-tile status-tint-${table.status}`}
+                onClick={() => handleTableClick(table)}
+                whileHover={{ y: -4 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.22 }}
+              >
+                <h2>{table.name}</h2>
+                <div style={{ marginTop: 'var(--spacing-1)', marginBottom: 'var(--spacing-1)' }}>
+                  <span className={`status-badge ${statusClass}`}>{statusLabel}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-1)', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                  <Users size={14} />
+                  {t.common.capacity}: {table.capacity}
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       )}
     </div>

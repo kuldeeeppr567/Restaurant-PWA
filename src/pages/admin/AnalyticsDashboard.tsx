@@ -20,6 +20,7 @@ import { orderRepository } from '../../repositories/orderRepository.ts';
 import { serviceRequestRepository } from '../../repositories/serviceRequestRepository.ts';
 import { PAYMENT_METHOD_LABELS } from '../../types/index.ts';
 import type { Payment, PaymentMethod } from '../../types/index.ts';
+import { useLanguage } from '../../hooks/useLanguage.ts';
 
 type DateRange = 'today' | '7days' | '30days' | 'custom';
 
@@ -40,6 +41,7 @@ export default function AnalyticsDashboard() {
   const [recentBills, setRecentBills] = useState<Payment[]>([]);
   const [avgPrepTime, setAvgPrepTime] = useState(0);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
 
   const getDays = useCallback(() => {
     if (dateRange === 'today') return 1;
@@ -104,38 +106,38 @@ export default function AnalyticsDashboard() {
     loadData();
   }, [loadData]);
 
-  if (loading) return <div className="p-4">Loading analytics...</div>;
+  if (loading) return <div className="p-4">{t.analyticsDashboard.loading}</div>;
 
   return (
     <div className="p-4">
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-        <h1 className="text-2xl font-bold">Analytics Dashboard</h1>
+        <h1 className="text-2xl font-bold">{t.analyticsDashboard.title}</h1>
         <select
           value={dateRange}
           onChange={(e) => setDateRange(e.target.value as DateRange)}
           className="border rounded px-3 py-2"
         >
-          <option value="today">Today</option>
-          <option value="7days">Last 7 Days</option>
-          <option value="30days">Last 30 Days</option>
+          <option value="today">{t.analyticsDashboard.dateToday}</option>
+          <option value="7days">{t.analyticsDashboard.date7days}</option>
+          <option value="30days">{t.analyticsDashboard.date30days}</option>
         </select>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-        <SummaryCard title="Today's Sales" value={`\u20B9${Math.round(todaySales)}`} />
-        <SummaryCard title="Completed Orders" value={String(todayOrders)} />
-        <SummaryCard title="Avg Bill Value" value={`\u20B9${Math.round(avgBill)}`} />
-        <SummaryCard title="Occupied Tables" value={String(occupiedCount)} />
-        <SummaryCard title="Pending Kitchen" value={String(pendingKitchen)} />
-        <SummaryCard title="Pending Service" value={String(pendingService)} />
+        <SummaryCard title={t.analyticsDashboard.cardSales} value={`₹${Math.round(todaySales)}`} />
+        <SummaryCard title={t.analyticsDashboard.cardOrders} value={String(todayOrders)} />
+        <SummaryCard title={t.analyticsDashboard.cardAvgBill} value={`₹${Math.round(avgBill)}`} />
+        <SummaryCard title={t.analyticsDashboard.cardTables} value={String(occupiedCount)} />
+        <SummaryCard title={t.analyticsDashboard.cardKitchen} value={String(pendingKitchen)} />
+        <SummaryCard title={t.analyticsDashboard.cardService} value={String(pendingService)} />
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Top Selling Items */}
         <div className="border rounded-lg p-4">
-          <h2 className="text-lg font-bold mb-3">Top Selling Items</h2>
+          <h2 className="text-lg font-bold mb-3">{t.analyticsDashboard.chartTopItems}</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={topItems}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -143,14 +145,14 @@ export default function AnalyticsDashboard() {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="quantity" fill="#8884d8" name="Quantity Sold" />
+              <Bar dataKey="quantity" fill="#8884d8" name={t.analyticsDashboard.chartQuantitySold} />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
         {/* Sales by Day */}
         <div className="border rounded-lg p-4">
-          <h2 className="text-lg font-bold mb-3">Sales by Day</h2>
+          <h2 className="text-lg font-bold mb-3">{t.analyticsDashboard.chartSalesByDay}</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={salesByDay}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -158,14 +160,14 @@ export default function AnalyticsDashboard() {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="total" stroke="#82ca9d" name="Revenue (\u20B9)" />
+              <Line type="monotone" dataKey="total" stroke="#82ca9d" name={t.analyticsDashboard.chartRevenue} />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
         {/* Sales by Payment Method */}
         <div className="border rounded-lg p-4">
-          <h2 className="text-lg font-bold mb-3">Sales by Payment Method</h2>
+          <h2 className="text-lg font-bold mb-3">{t.analyticsDashboard.chartSalesByMethod}</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -189,7 +191,7 @@ export default function AnalyticsDashboard() {
 
         {/* Revenue by Menu Item */}
         <div className="border rounded-lg p-4">
-          <h2 className="text-lg font-bold mb-3">Revenue by Menu Item (Top 10)</h2>
+          <h2 className="text-lg font-bold mb-3">{t.analyticsDashboard.chartRevenueByItem}</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={revenueByItem}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -197,7 +199,7 @@ export default function AnalyticsDashboard() {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="revenue" fill="#ffc658" name="Revenue (\u20B9)" />
+              <Bar dataKey="revenue" fill="#ffc658" name={t.analyticsDashboard.chartRevenue} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -205,34 +207,34 @@ export default function AnalyticsDashboard() {
 
       {/* Average Prep Time */}
       <div className="mb-8 border rounded-lg p-4">
-        <h2 className="text-lg font-bold mb-2">Average Preparation Time</h2>
-        <p className="text-3xl font-bold">{avgPrepTime.toFixed(1)} min</p>
+        <h2 className="text-lg font-bold mb-2">{t.analyticsDashboard.avgPrepTime}</h2>
+        <p className="text-3xl font-bold">{avgPrepTime.toFixed(1)} {t.analyticsDashboard.min}</p>
       </div>
 
       {/* Recent Bills */}
       <div className="border rounded-lg p-4">
-        <h2 className="text-lg font-bold mb-3">Recent Completed Bills</h2>
+        <h2 className="text-lg font-bold mb-3">{t.analyticsDashboard.recentBills}</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b-2">
-                <th className="text-left py-2">Date</th>
-                <th className="text-right py-2">Subtotal</th>
-                <th className="text-right py-2">Discount</th>
-                <th className="text-right py-2">Tax</th>
-                <th className="text-right py-2">Total</th>
-                <th className="text-left py-2">Method</th>
+                <th className="text-left py-2">{t.analyticsDashboard.colDate}</th>
+                <th className="text-right py-2">{t.analyticsDashboard.colSubtotal}</th>
+                <th className="text-right py-2">{t.analyticsDashboard.colDiscount}</th>
+                <th className="text-right py-2">{t.analyticsDashboard.colTax}</th>
+                <th className="text-right py-2">{t.analyticsDashboard.colTotal}</th>
+                <th className="text-left py-2">{t.analyticsDashboard.colMethod}</th>
               </tr>
             </thead>
             <tbody>
               {recentBills.map((bill) => (
                 <tr key={bill.id} className="border-b">
                   <td className="py-2">{new Date(bill.paidAt).toLocaleString()}</td>
-                  <td className="text-right py-2">{'\u20B9'}{bill.subtotal}</td>
-                  <td className="text-right py-2">{'\u20B9'}{bill.discountAmount}</td>
-                  <td className="text-right py-2">{'\u20B9'}{bill.taxAmount}</td>
-                  <td className="text-right py-2 font-bold">{'\u20B9'}{bill.total}</td>
-                  <td className="py-2">{PAYMENT_METHOD_LABELS[bill.method]}</td>
+                  <td className="text-right py-2">₹{bill.subtotal}</td>
+                  <td className="text-right py-2">₹{bill.discountAmount}</td>
+                  <td className="text-right py-2">₹{bill.taxAmount}</td>
+                  <td className="text-right py-2 font-bold">₹{bill.total}</td>
+                  <td className="py-2">{t.paymentMethod[bill.method] ?? bill.method}</td>
                 </tr>
               ))}
             </tbody>

@@ -870,6 +870,47 @@ th:last-child {
 .overflow-x-auto { overflow-x: auto; }
 .w-full { width: 100%; }
 .w-20 { width: 5rem; }
+.w-3 { width: 0.75rem; }
+.h-3 { height: 0.75rem; }
+
+/* Horizontal padding utilities */
+.px-1 { padding-left: 0.25rem; padding-right: 0.25rem; }
+.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+.px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.ml-auto { margin-left: auto; }
+
+/* Alignment & display helpers */
+.items-end { align-items: flex-end; }
+.capitalize { text-transform: capitalize; }
+.cursor-not-allowed { cursor: not-allowed; }
+
+/* Text colours */
+.text-white { color: #ffffff; }
+.text-blue-800 { color: #1e40af; }
+.text-gray-400 { color: #9ca3af; }
+.text-base { font-size: 1rem; }
+
+/* Background colours used in admin pages */
+.bg-green-500 { background-color: var(--success); }
+.bg-red-500   { background-color: var(--danger); }
+.bg-green-600 { background-color: #16a34a; }
+.bg-blue-600  { background-color: var(--primary); }
+.bg-gray-400  { background-color: #9ca3af; }
+.bg-gray-500  { background-color: #6b7280; }
+.bg-red-600   { background-color: #dc2626; }
+
+/* Hover variants (Tailwind-compatible escaped colons) */
+.hover\:bg-green-700:hover { background-color: #15803d; }
+.hover\:bg-blue-700:hover  { background-color: #1d4ed8; }
+.hover\:bg-gray-500:hover  { background-color: #6b7280; }
+.hover\:bg-red-700:hover   { background-color: #b91c1c; }
+
+/* Disabled helper */
+.disabled\:opacity-50:disabled { opacity: 0.5; }
+
+/* Border style */
+.border-dashed { border-style: dashed; }
 
 .text-gray-500,
 .text-gray-600 {
