@@ -30,14 +30,14 @@ const copy = {
     languageLabel: 'Language',
     languageDisabledHint: 'Language selection is unavailable while demo data is updating.',
     title: 'Restaurant POS',
-    subtitle: 'Premium command center for service, kitchen, and billing workflows',
+    subtitle: '',
     onlineStatus: 'Live sync available',
     offlineStatus: 'Offline mode active',
     roles: {
-      waiter: { title: 'Waiter', description: 'Take orders and serve tables' },
-      kitchen: { title: 'Kitchen', description: 'Manage food preparation' },
-      cashier: { title: 'Cashier', description: 'Handle billing and payments' },
-      admin: { title: 'Owner/Admin', description: 'Menu management and analytics' },
+      waiter: { title: 'Order', description: 'Take orders and serve tables' },
+      kitchen: { title: 'Kitchen', description: 'Food Order Status' },
+      cashier: { title: 'Payment', description: 'Billing and Payment' },
+      admin: { title: 'Admin', description: 'Manage Settings' },
     },
     footer: 'Demo mode: no authentication enabled.',
     loadDemo: 'Load Demo Data',
@@ -52,17 +52,17 @@ const copy = {
     resetDemoError: 'Failed to reset data: ',
   },
   hi: {
-    languageLabel: 'भाषा',
+    languageLabel: 'भाषा चुनें',
     languageDisabledHint: 'डेमो डेटा अपडेट होने के दौरान भाषा नहीं बदली जा सकती।',
     title: 'रेस्टोरेंट POS',
-    subtitle: 'सेवा, रसोई और बिलिंग वर्कफ़्लो के लिए प्रीमियम कमांड सेंटर',
+    subtitle: '',
     onlineStatus: 'लाइव सिंक उपलब्ध है',
     offlineStatus: 'ऑफलाइन मोड सक्रिय है',
     roles: {
-      waiter: { title: 'वेटर', description: 'ऑर्डर लें और टेबल सर्विस संभालें' },
-      kitchen: { title: 'रसोई', description: 'भोजन तैयारी को मैनेज करें' },
-      cashier: { title: 'कैशियर', description: 'बिलिंग और पेमेंट संभालें' },
-      admin: { title: 'मालिक / एडमिन', description: 'मेन्यू मैनेजमेंट और एनालिटिक्स' },
+      waiter: { title: 'ऑर्डर', description: 'ऑर्डर और टेबल सर्विस' },
+      kitchen: { title: 'किचन', description: 'भोजन के ऑर्डर की स्थिति देखे' },
+      cashier: { title: 'पेमेंट', description: 'बिलिंग और पेमेंट' },
+      admin: { title: 'एडमिन', description: 'सेटिंग मैनेज करे' },
     },
     footer: 'डेमो मोड: ऑथेंटिकेशन सक्षम नहीं है।',
     loadDemo: 'डेमो डेटा लोड करें',
@@ -145,7 +145,7 @@ export default function RoleSelection() {
       <div className="role-hero">
         <div className="role-logo"><Receipt size={28} /></div>
         <h1 className="page-title">{text.title}</h1>
-        <p className="page-subtitle">{text.subtitle}</p>
+        {text.subtitle && <p className="page-subtitle">{text.subtitle}</p>}
         <div className="role-language-selector">
           <label htmlFor="language-select" className="role-language-label">
             {text.languageLabel}
