@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { RestaurantTable, MenuItem, OrderItem, OrderItemStatus } from '../../types/index.ts';
-import { getSpecialInstructionsForCategory, ORDER_STATUS_LABELS } from '../../types/index.ts';
+import { getSpecialInstructionsForCategory } from '../../types/index.ts';
 import { tableRepository } from '../../repositories/tableRepository.ts';
 import { sessionRepository } from '../../repositories/sessionRepository.ts';
 import { menuRepository } from '../../repositories/menuRepository.ts';
 import { orderRepository } from '../../repositories/orderRepository.ts';
+import { useLanguage } from '../../hooks/useLanguage.ts';
 
 interface DraftItem {
   menuItem: MenuItem;
@@ -27,6 +28,7 @@ function splitCategory(category: string): { broad: string; sub: string } {
 export default function OrderPage() {
   const { tableId } = useParams<{ tableId: string }>();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [table, setTable] = useState<RestaurantTable | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [sessionId, setSessionId] = useState<number | null>(null);
@@ -231,8 +233,8 @@ export default function OrderPage() {
     fetchData();
   }, [table, sessionId, fetchData]);
 
-  if (loading) return <div className="page-container"><p>Loading...</p></div>;
-  if (!table) return <div className="page-container"><p>Table not found.</p></div>;
+  if (loading) return <div className="page-container"><p>{t.common.loading}</p></div>;
+  if (!table) return <div className="page-container"><p>{t.orderPage.tableNotFound}</p></div>;
 
   const grouped = orderItems.reduce<Record<OrderItemStatus, OrderItem[]>>((acc, item) => {
     if (!acc[item.status]) acc[item.status] = [];
@@ -249,21 +251,22 @@ export default function OrderPage() {
   return (
     <div className="page-container">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-        <h1>{table.name} - Order</h1>
-        <button className="btn btn-secondary" onClick={() => navigate('/waiter/tables')}>Back</button>
+        <h1>{t.orderPage.title(table.name)}</h1>
+        <button className="btn btn-secondary" onClick={() => navigate('/waiter/tables')}>{t.common.back}</button>
       </div>
 
       {/* Existing order items */}
       {orderItems.length === 0 && !showPicker && (
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>No items yet. Add items to get started.</p>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>{t.orderPage.noItems}</p>
       )}
 
       {statusOrder.map((status) => {
         const items = grouped[status];
         if (!items || items.length === 0) return null;
+        const statusLabel = t.orderStatus[status as OrderItemStatus] ?? status;
         return (
           <div key={status} style={{ marginBottom: '1rem' }}>
-            <h3>{ORDER_STATUS_LABELS[status]} ({items.length})</h3>
+            <h3>{statusLabel} ({items.length})</h3>
             {items.map((item) => (
               <div key={item.id} className="card" style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
@@ -281,10 +284,10 @@ export default function OrderPage() {
                   )}
                 </div>
                 {item.status === 'ready' && (
-                  <button className="btn btn-primary" onClick={() => markServed(item.id!)}>Mark Served</button>
+                  <button className="btn btn-primary" onClick={() => markServed(item.id!)}>{t.orderPage.markServed}</button>
                 )}
                 {item.status === 'draft' && (
-                  <button className="btn btn-danger" onClick={() => removeOrderItem(item.id!)}>Remove</button>
+                  <button className="btn btn-danger" onClick={() => removeOrderItem(item.id!)}>{t.orderPage.remove}</button>
                 )}
               </div>
             ))}
@@ -294,12 +297,12 @@ export default function OrderPage() {
 
       {/* Action buttons */}
       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-        <button className="btn btn-primary" onClick={openPicker}>Add Items</button>
+        <button className="btn btn-primary" onClick={openPicker}>{t.orderPage.addItems}</button>
         {orderItems.some((i) => i.status === 'draft') && (
-          <button className="btn btn-success" onClick={submitToKitchen}>Submit to Kitchen</button>
+          <button className="btn btn-success" onClick={submitToKitchen}>{t.orderPage.submitToKitchen}</button>
         )}
         {orderItems.length > 0 && table.status !== 'billing_requested' && (
-          <button className="btn btn-warning" onClick={requestBilling}>Request Billing</button>
+          <button className="btn btn-warning" onClick={requestBilling}>{t.orderPage.requestBilling}</button>
         )}
       </div>
 
@@ -307,8 +310,8 @@ export default function OrderPage() {
       {showPicker && (
         <div style={{ border: '2px solid var(--border)', borderRadius: '8px', padding: '1rem', background: 'var(--surface)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h2>Select Items</h2>
-            <button className="btn btn-secondary" onClick={() => setShowPicker(false)}>Close</button>
+            <h2>{t.orderPage.selectItems}</h2>
+            <button className="btn btn-secondary" onClick={() => setShowPicker(false)}>{t.orderPage.close}</button>
           </div>
 
           {/* Category selectors */}
@@ -374,7 +377,7 @@ export default function OrderPage() {
                     </div>
                     <input
                       type="text"
-                      placeholder="Custom notes..."
+                      placeholder={t.orderPage.customNotes}
                       value={draft.customNotes}
                       onChange={(e) => setCustomNotes(item.id!, e.target.value)}
                       className="input"
@@ -388,7 +391,7 @@ export default function OrderPage() {
 
           {draftItems.length > 0 && (
             <button className="btn btn-success" onClick={addToOrder} style={{ marginTop: '1rem', width: '100%' }}>
-              Add {draftItems.reduce((s, d) => s + d.quantity, 0)} Item(s) to Order
+              {t.orderPage.addToOrder(draftItems.reduce((s, d) => s + d.quantity, 0))}
             </button>
           )}
         </div>

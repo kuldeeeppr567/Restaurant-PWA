@@ -2,20 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Clock3, CookingPot, StickyNote } from 'lucide-react';
 import type { OrderItem, OrderItemStatus } from '../../types/index.ts';
-import { ORDER_STATUS_LABELS } from '../../types/index.ts';
 import { orderRepository } from '../../repositories/orderRepository.ts';
+import { useLanguage } from '../../hooks/useLanguage.ts';
+import { timeAgo } from '../../i18n/index.ts';
 
 type FilterTab = 'all' | 'submitted' | 'preparing' | 'ready';
 
 const iconSize = 14;
 const tokenSpacing = 'var(--spacing-1)';
-
-function timeElapsed(isoDate: string): string {
-  const diff = Math.floor((Date.now() - new Date(isoDate).getTime()) / 60000);
-  if (diff < 1) return 'Just now';
-  if (diff < 60) return `${diff} min ago`;
-  return `${Math.floor(diff / 60)}h ${diff % 60}m ago`;
-}
 
 const statusBadgeClass: Record<string, string> = {
   submitted: 'badge-warning',
@@ -27,6 +21,7 @@ export default function KitchenDisplay() {
   const [items, setItems] = useState<OrderItem[]>([]);
   const [filter, setFilter] = useState<FilterTab>('all');
   const [loading, setLoading] = useState(true);
+  const { lang, t } = useLanguage();
 
   const fetchItems = useCallback(async () => {
     const queue = await orderRepository.getKitchenQueue();
@@ -49,20 +44,20 @@ export default function KitchenDisplay() {
   const filtered = filter === 'all' ? items : items.filter((i) => i.status === filter);
 
   const tabs: { key: FilterTab; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'submitted', label: 'Pending' },
-    { key: 'preparing', label: 'Preparing' },
-    { key: 'ready', label: 'Ready' },
+    { key: 'all', label: t.common.all },
+    { key: 'submitted', label: t.kitchenDisplay.filterPending },
+    { key: 'preparing', label: t.kitchenDisplay.filterPreparing },
+    { key: 'ready', label: t.kitchenDisplay.filterReady },
   ];
 
-  if (loading) return <div className="page-container"><p>Loading kitchen queue...</p></div>;
+  if (loading) return <div className="page-container"><p>{t.kitchenDisplay.loadingQueue}</p></div>;
 
   return (
     <div className="page-container">
       <div className="page-header">
         <div>
-          <h1 className="page-title">Kitchen Queue</h1>
-          <p className="page-subtitle">Track preparation in real time</p>
+          <h1 className="page-title">{t.kitchenDisplay.title}</h1>
+          <p className="page-subtitle">{t.kitchenDisplay.subtitle}</p>
         </div>
       </div>
 
@@ -75,18 +70,18 @@ export default function KitchenDisplay() {
       </div>
 
       {filtered.length === 0 ? (
-        <p className="page-subtitle">No items in queue.</p>
+        <p className="page-subtitle">{t.kitchenDisplay.noItems}</p>
       ) : (
         <div className="kitchen-grid">
           {filtered.map((item) => (
             <motion.div key={item.id} className="card kitchen-card" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.24 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ fontSize: '1.3rem', fontWeight: 700 }}>Table {item.tableId}</h3>
-                <span className={`badge ${statusBadgeClass[item.status] || ''}`}>{ORDER_STATUS_LABELS[item.status]}</span>
+                <h3 style={{ fontSize: '1.3rem', fontWeight: 700 }}>{t.kitchenDisplay.tablePrefix} {item.tableId}</h3>
+                <span className={`badge ${statusBadgeClass[item.status] || ''}`}>{t.orderStatus[item.status as OrderItemStatus] ?? item.status}</span>
               </div>
 
               <p style={{ marginTop: 'var(--spacing-1)', fontSize: '1.2rem', fontWeight: 600 }}>{item.itemName}</p>
-              <p className="page-subtitle">Qty: <strong>{item.quantity}</strong></p>
+              <p className="page-subtitle">{t.kitchenDisplay.qty} <strong>{item.quantity}</strong></p>
 
               {item.specialInstructions.length > 0 && (
                 <div className="kitchen-warning">
@@ -106,21 +101,21 @@ export default function KitchenDisplay() {
               )}
 
               <div className="kitchen-item-meta">
-                <span className="page-subtitle" style={{ display: 'inline-flex', alignItems: 'center', gap: tokenSpacing }}><Clock3 size={iconSize} />{timeElapsed(item.orderedAt)}</span>
+                <span className="page-subtitle" style={{ display: 'inline-flex', alignItems: 'center', gap: tokenSpacing }}><Clock3 size={iconSize} />{timeAgo(item.orderedAt, lang)}</span>
               </div>
 
               <div style={{ marginTop: 'var(--spacing-2)' }}>
                 {item.status === 'submitted' && (
                   <button className="btn btn-primary" style={{ width: '100%' }} onClick={() => handleStatusChange(item.id!, 'preparing')}>
-                    Start Preparing
+                    {t.kitchenDisplay.startPreparing}
                   </button>
                 )}
                 {item.status === 'preparing' && (
                   <button className="btn btn-success" style={{ width: '100%' }} onClick={() => handleStatusChange(item.id!, 'ready')}>
-                    Mark Ready
+                    {t.kitchenDisplay.markReady}
                   </button>
                 )}
-                {item.status === 'ready' && <p className="page-subtitle" style={{ textAlign: 'center' }}>Waiting for waiter to serve</p>}
+                {item.status === 'ready' && <p className="page-subtitle" style={{ textAlign: 'center' }}>{t.kitchenDisplay.waitingForWaiter}</p>}
               </div>
             </motion.div>
           ))}

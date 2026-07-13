@@ -1,22 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { ServiceRequest, ServiceRequestType, RestaurantTable, DiningSession } from '../../types/index.ts';
-import { SERVICE_REQUEST_LABELS } from '../../types/index.ts';
 import { serviceRequestRepository } from '../../repositories/serviceRequestRepository.ts';
 import { tableRepository } from '../../repositories/tableRepository.ts';
 import { sessionRepository } from '../../repositories/sessionRepository.ts';
-
-function timeElapsed(isoDate: string): string {
-  const diff = Math.floor((Date.now() - new Date(isoDate).getTime()) / 60000);
-  if (diff < 1) return 'Just now';
-  if (diff < 60) return `${diff} min ago`;
-  return `${Math.floor(diff / 60)}h ${diff % 60}m ago`;
-}
+import { useLanguage } from '../../hooks/useLanguage.ts';
+import { timeAgo } from '../../i18n/index.ts';
 
 export default function ServiceDashboard() {
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [occupiedTables, setOccupiedTables] = useState<RestaurantTable[]>([]);
   const [sessions, setSessions] = useState<DiningSession[]>([]);
   const [loading, setLoading] = useState(true);
+  const { lang, t } = useLanguage();
 
   // Add request form
   const [selectedTableId, setSelectedTableId] = useState<number | ''>('');
@@ -64,17 +59,17 @@ export default function ServiceDashboard() {
     fetchData();
   }, [selectedTableId, requestType, notes, occupiedTables, sessions, fetchData]);
 
-  if (loading) return <div className="page-container"><p>Loading...</p></div>;
+  if (loading) return <div className="page-container"><p>{t.common.loading}</p></div>;
 
-  const requestTypes = Object.keys(SERVICE_REQUEST_LABELS) as ServiceRequestType[];
+  const requestTypes = Object.keys(t.serviceType) as ServiceRequestType[];
 
   return (
     <div className="page-container">
-      <h1 style={{ marginBottom: '1rem' }}>Service Requests</h1>
+      <h1 style={{ marginBottom: '1rem' }}>{t.serviceDashboard.title}</h1>
 
       {/* Pending requests */}
       {requests.length === 0 ? (
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>No pending service requests.</p>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>{t.serviceDashboard.noPending}</p>
       ) : (
         <div style={{ marginBottom: '1.5rem' }}>
           {requests.map((req) => (
@@ -82,14 +77,14 @@ export default function ServiceDashboard() {
               <div>
                 <strong>{req.tableName}</strong>
                 <span className="badge badge-info" style={{ marginLeft: '0.5rem' }}>
-                  {SERVICE_REQUEST_LABELS[req.type]}
+                  {t.serviceType[req.type as ServiceRequestType] ?? req.type}
                 </span>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                  {timeElapsed(req.requestedAt)}
+                  {timeAgo(req.requestedAt, lang)}
                   {req.notes && <span> — {req.notes}</span>}
                 </div>
               </div>
-              <button className="btn btn-success" onClick={() => handleComplete(req.id!)}>Complete</button>
+              <button className="btn btn-success" onClick={() => handleComplete(req.id!)}>{t.serviceDashboard.complete}</button>
             </div>
           ))}
         </div>
@@ -97,25 +92,25 @@ export default function ServiceDashboard() {
 
       {/* Add request form */}
       <div className="card" style={{ padding: '1rem' }}>
-        <h2 style={{ marginBottom: '1rem' }}>Add Request</h2>
+        <h2 style={{ marginBottom: '1rem' }}>{t.serviceDashboard.addRequest}</h2>
 
         <div style={{ marginBottom: '0.75rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 600 }}>Table</label>
+          <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 600 }}>{t.serviceDashboard.tableLabel}</label>
           <select
             className="input"
             value={selectedTableId}
             onChange={(e) => setSelectedTableId(e.target.value ? parseInt(e.target.value, 10) : '')}
             style={{ width: '100%' }}
           >
-            <option value="">Select a table</option>
-            {occupiedTables.map((t) => (
-              <option key={t.id} value={t.id}>{t.name}</option>
+            <option value="">{t.serviceDashboard.selectTable}</option>
+            {occupiedTables.map((tbl) => (
+              <option key={tbl.id} value={tbl.id}>{tbl.name}</option>
             ))}
           </select>
         </div>
 
         <div style={{ marginBottom: '0.75rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 600 }}>Request Type</label>
+          <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 600 }}>{t.serviceDashboard.requestType}</label>
           <select
             className="input"
             value={requestType}
@@ -123,17 +118,17 @@ export default function ServiceDashboard() {
             style={{ width: '100%' }}
           >
             {requestTypes.map((type) => (
-              <option key={type} value={type}>{SERVICE_REQUEST_LABELS[type]}</option>
+              <option key={type} value={type}>{t.serviceType[type]}</option>
             ))}
           </select>
         </div>
 
         <div style={{ marginBottom: '0.75rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 600 }}>Notes (optional)</label>
+          <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 600 }}>{t.serviceDashboard.notes}</label>
           <input
             type="text"
             className="input"
-            placeholder="Any additional details..."
+            placeholder={t.serviceDashboard.notesPlaceholder}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             style={{ width: '100%' }}
@@ -141,7 +136,7 @@ export default function ServiceDashboard() {
         </div>
 
         <button className="btn btn-primary" onClick={handleSubmit} disabled={!selectedTableId}>
-          Submit Request
+          {t.serviceDashboard.submit}
         </button>
       </div>
     </div>

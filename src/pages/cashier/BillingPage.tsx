@@ -6,8 +6,8 @@ import { tableRepository } from '../../repositories/tableRepository.ts';
 import { sessionRepository } from '../../repositories/sessionRepository.ts';
 import { orderRepository } from '../../repositories/orderRepository.ts';
 import { paymentRepository } from '../../repositories/paymentRepository.ts';
-import { PAYMENT_METHOD_LABELS } from '../../types/index.ts';
-import type { RestaurantTable, DiningSession, OrderItem, PaymentMethod } from '../../types/index.ts';
+import type { RestaurantTable, DiningSession, OrderItem, PaymentMethod, TableStatus } from '../../types/index.ts';
+import { useLanguage } from '../../hooks/useLanguage.ts';
 
 const paymentIcons: Record<PaymentMethod, ReactNode> = {
   cash: <Wallet size={18} />,
@@ -20,6 +20,7 @@ const paymentIcons: Record<PaymentMethod, ReactNode> = {
 
 export default function BillingPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [tables, setTables] = useState<RestaurantTable[]>([]);
   const [selectedTable, setSelectedTable] = useState<RestaurantTable | null>(null);
   const [session, setSession] = useState<DiningSession | null>(null);
@@ -80,7 +81,8 @@ export default function BillingPage() {
 
   const handleRecordPayment = async () => {
     if (!session?.id || !selectedTable?.id) return;
-    const confirmed = window.confirm(`Record payment of \u20B9${grandTotal} via ${PAYMENT_METHOD_LABELS[paymentMethod]}?`);
+    const methodLabel = t.paymentMethod[paymentMethod] ?? paymentMethod;
+    const confirmed = window.confirm(t.billingPage.confirmPayment(grandTotal, methodLabel));
     if (!confirmed) return;
 
     await paymentRepository.create({
@@ -123,36 +125,40 @@ export default function BillingPage() {
     setIsPaid(false);
   };
 
-  if (loading) return <div className="page-container"><p>Loading...</p></div>;
+  if (loading) return <div className="page-container"><p>{t.billingPage.loading}</p></div>;
 
   if (!selectedTable) {
     return (
       <div className="page-container">
         <div className="page-header">
           <div>
-            <h1 className="page-title">Billing</h1>
-            <p className="page-subtitle">Select a table to generate or settle the bill</p>
+            <h1 className="page-title">{t.billingPage.title}</h1>
+            <p className="page-subtitle">{t.billingPage.subtitle}</p>
           </div>
         </div>
 
         {tables.length === 0 ? (
-          <p className="page-subtitle">No tables require billing.</p>
+          <p className="page-subtitle">{t.billingPage.noTables}</p>
         ) : (
           <div className="table-grid">
-            {tables.map((table) => (
-              <motion.button
-                key={table.id}
-                onClick={() => selectTable(table)}
-                className={`card table-tile status-tint-${table.status}`}
-                whileHover={{ y: -4 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className="text-left">
-                  <div className="text-2xl font-bold">{table.name}</div>
-                  <div style={{ marginTop: 'var(--spacing-1)' }} className={`status-badge ${table.status}`}>{table.status.replace(/_/g, ' ')}</div>
-                </div>
-              </motion.button>
-            ))}
+            {tables.map((table) => {
+              const statusClass = (table.status as string).replace(/_/g, '-').toLowerCase();
+              const statusLabel = t.tableStatus[table.status as TableStatus] ?? table.status;
+              return (
+                <motion.button
+                  key={table.id}
+                  onClick={() => selectTable(table)}
+                  className={`card table-tile status-tint-${table.status}`}
+                  whileHover={{ y: -4 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="text-left">
+                    <div className="text-2xl font-bold">{table.name}</div>
+                    <div style={{ marginTop: 'var(--spacing-1)' }} className={`status-badge ${statusClass}`}>{statusLabel}</div>
+                  </div>
+                </motion.button>
+              );
+            })}
           </div>
         )}
       </div>
@@ -162,12 +168,12 @@ export default function BillingPage() {
   return (
     <div className="page-container" style={{ maxWidth: '860px' }}>
       <button onClick={goBack} className="btn btn-secondary" style={{ marginBottom: '16px' }}>
-        <ArrowLeft size={16} /> Back to tables
+        <ArrowLeft size={16} /> {t.billingPage.backToTables}
       </button>
 
       <div className="card billing-summary" style={{ marginBottom: '20px' }}>
-        <h1 className="page-title" style={{ fontSize: '1.8rem', marginBottom: 6 }}>{selectedTable.name} Bill</h1>
-        <p className="page-subtitle">Wallet-style order summary and payment settlement</p>
+        <h1 className="page-title" style={{ fontSize: '1.8rem', marginBottom: 6 }}>{selectedTable.name} {t.billingPage.billSuffix}</h1>
+        <p className="page-subtitle">{t.billingPage.billSubtitle}</p>
       </div>
 
       <div className="billing-layout">
@@ -176,10 +182,10 @@ export default function BillingPage() {
             <table>
               <thead>
                 <tr>
-                  <th>Item</th>
-                  <th>Qty</th>
-                  <th>Price</th>
-                  <th>Total</th>
+                  <th>{t.billingPage.colItem}</th>
+                  <th>{t.billingPage.colQty}</th>
+                  <th>{t.billingPage.colPrice}</th>
+                  <th>{t.billingPage.colTotal}</th>
                 </tr>
               </thead>
               <tbody>
@@ -187,63 +193,63 @@ export default function BillingPage() {
                   <tr key={item.id}>
                     <td>{item.itemName}</td>
                     <td>{item.quantity}</td>
-                    <td>\u20B9{item.priceSnapshot}</td>
-                    <td>\u20B9{item.priceSnapshot * item.quantity}</td>
+                    <td>₹{item.priceSnapshot}</td>
+                    <td>₹{item.priceSnapshot * item.quantity}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          <div className="bill-row"><span>Subtotal</span><span>\u20B9{subtotal}</span></div>
+          <div className="bill-row"><span>{t.billingPage.subtotal}</span><span>₹{subtotal}</span></div>
 
           {!isPaid && (
             <div className="bill-row" style={{ alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-              <span>Discount</span>
+              <span>{t.billingPage.discount}</span>
               <select value={discountType} onChange={(e) => setDiscountType(e.target.value as 'fixed' | 'percentage')} style={{ maxWidth: 170 }}>
-                <option value="fixed">Fixed (\u20B9)</option>
-                <option value="percentage">Percentage (%)</option>
+                <option value="fixed">{t.billingPage.discountFixed}</option>
+                <option value="percentage">{t.billingPage.discountPct}</option>
               </select>
               <input type="number" min={0} value={discountValue} onChange={(e) => setDiscountValue(Number(e.target.value))} style={{ maxWidth: 120 }} />
-              <span className="page-subtitle">= \u20B9{discountAmount}</span>
+              <span className="page-subtitle">= ₹{discountAmount}</span>
             </div>
           )}
 
           {isPaid && discountAmount > 0 && (
-            <div className="bill-row"><span>Discount</span><span>-\u20B9{discountAmount}</span></div>
+            <div className="bill-row"><span>{t.billingPage.discount}</span><span>-₹{discountAmount}</span></div>
           )}
 
-          <div className="bill-row"><span>GST ({taxRate}%)</span><span>\u20B9{taxAmount}</span></div>
-          <div className="bill-row total-row"><span>Grand Total</span><span>\u20B9{grandTotal}</span></div>
+          <div className="bill-row"><span>{t.billingPage.gst(taxRate)}</span><span>₹{taxAmount}</span></div>
+          <div className="bill-row total-row"><span>{t.billingPage.grandTotal}</span><span>₹{grandTotal}</span></div>
         </div>
 
         {!isPaid && (
           <div className="card">
-            <label>Payment Method</label>
+            <label>{t.billingPage.paymentMethod}</label>
             <div className="payment-options" style={{ marginBottom: '16px' }}>
-              {(Object.entries(PAYMENT_METHOD_LABELS) as [PaymentMethod, string][]).map(([value, label]) => (
+              {(Object.keys(paymentIcons) as PaymentMethod[]).map((value) => (
                 <button key={value} type="button" className={`payment-option ${paymentMethod === value ? 'active' : ''}`} onClick={() => setPaymentMethod(value)}>
                   {paymentIcons[value]}
-                  <span>{label}</span>
+                  <span>{t.paymentMethod[value]}</span>
                 </button>
               ))}
             </div>
 
             <div className="form-group">
-              <label>Reference Number (optional)</label>
-              <input type="text" value={referenceNumber} onChange={(e) => setReferenceNumber(e.target.value)} placeholder="Transaction ID / Reference" />
+              <label>{t.billingPage.referenceNumber}</label>
+              <input type="text" value={referenceNumber} onChange={(e) => setReferenceNumber(e.target.value)} placeholder={t.billingPage.referencePlaceholder} />
             </div>
 
             <button onClick={handleRecordPayment} className="btn btn-primary btn-lg" style={{ width: '100%', marginTop: '4px' }}>
-              Record Payment
+              {t.billingPage.recordPayment}
             </button>
           </div>
         )}
 
         {isPaid && (
           <div className="card" style={{ display: 'grid', gap: '12px' }}>
-            <button onClick={handlePrintReceipt} className="btn btn-primary">Print Receipt</button>
-            <button onClick={handleDone} className="btn btn-secondary">Done</button>
+            <button onClick={handlePrintReceipt} className="btn btn-primary">{t.billingPage.printReceipt}</button>
+            <button onClick={handleDone} className="btn btn-secondary">{t.billingPage.done}</button>
           </div>
         )}
       </div>
