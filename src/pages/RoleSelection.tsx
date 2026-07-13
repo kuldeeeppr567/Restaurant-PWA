@@ -30,7 +30,7 @@ const copy = {
     languageLabel: 'Language',
     languageDisabledHint: 'Language selection is unavailable while demo data is updating.',
     title: 'Restaurant POS',
-    subtitle: '',
+    subtitle: 'Premium command center for service, kitchen, and billing workflows',
     onlineStatus: 'Live sync available',
     offlineStatus: 'Offline mode active',
     roles: {
@@ -55,7 +55,7 @@ const copy = {
     languageLabel: 'भाषा चुनें',
     languageDisabledHint: 'डेमो डेटा अपडेट होने के दौरान भाषा नहीं बदली जा सकती।',
     title: 'रेस्टोरेंट POS',
-    subtitle: '',
+    subtitle: 'सेवा, रसोई और बिलिंग वर्कफ़्लो के लिए प्रीमियम कमांड सेंटर',
     onlineStatus: 'लाइव सिंक उपलब्ध है',
     offlineStatus: 'ऑफलाइन मोड सक्रिय है',
     roles: {
