@@ -604,6 +604,23 @@ label {
   margin-bottom: var(--spacing-4);
 }
 
+.role-language-selector {
+  width: 100%;
+  max-width: 240px;
+  margin: 16px auto 0;
+  text-align: left;
+}
+
+.role-language-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--spacing-1);
+}
+
+.role-status-text {
+  margin-top: 10px;
+}
+
 .role-logo {
   width: 68px;
   height: 68px;
@@ -646,6 +663,13 @@ label {
 .role-footer {
   color: #9a3412;
   margin-bottom: var(--spacing-3);
+}
+
+.role-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .table-tile {
