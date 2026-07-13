@@ -234,7 +234,7 @@ export default function AnalyticsDashboard() {
                   <td className="text-right py-2">₹{bill.discountAmount}</td>
                   <td className="text-right py-2">₹{bill.taxAmount}</td>
                   <td className="text-right py-2 font-bold">₹{bill.total}</td>
-                  <td className="py-2">{t.paymentMethod[bill.method] ?? PAYMENT_METHOD_LABELS[bill.method]}</td>
+                  <td className="py-2">{t.paymentMethod[bill.method] ?? bill.method}</td>
                 </tr>
               ))}
             </tbody>

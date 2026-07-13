@@ -6,7 +6,7 @@ export function timeAgo(isoDate: string, lang: Language): string {
   if (lang === 'hi') {
     if (diff < 1) return 'अभी';
     if (diff < 60) return `${diff} मिनट पहले`;
-    return `${Math.floor(diff / 60)}घ ${diff % 60}म पहले`;
+    return `${Math.floor(diff / 60)} घ ${diff % 60} म पहले`;
   }
   if (diff < 1) return 'Just now';
   if (diff < 60) return `${diff} min ago`;
