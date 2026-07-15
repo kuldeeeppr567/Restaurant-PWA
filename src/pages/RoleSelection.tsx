@@ -8,71 +8,60 @@ import { useOnlineStatus } from '../hooks/useOnlineStatus.ts';
 const OrderIcon3D = () => (
   <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
-      <linearGradient id="ord-dome-g" x1="0.2" y1="0" x2="0.9" y2="1">
-        <stop offset="0%" stopColor="#ffffff" />
-        <stop offset="55%" stopColor="#eff6ff" />
-        <stop offset="100%" stopColor="#bfdbfe" />
-      </linearGradient>
-      <linearGradient id="ord-plate-g" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="#dbeafe" />
-        <stop offset="100%" stopColor="#93c5fd" />
-      </linearGradient>
-      <linearGradient id="ord-handle-g" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="#60a5fa" />
-        <stop offset="100%" stopColor="#2563eb" />
-      </linearGradient>
-      <filter id="ord-drop" x="-20%" y="-20%" width="140%" height="140%">
-        <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#1e40af" floodOpacity="0.22" />
+      <radialGradient id="ord-glass-g" cx="38%" cy="32%" r="68%" gradientUnits="userSpaceOnUse" fx="30" fy="26">
+        <stop offset="0%" stopColor="#bfdbfe" stopOpacity="0.95" />
+        <stop offset="100%" stopColor="#1d4ed8" stopOpacity="0.88" />
+      </radialGradient>
+      <filter id="ord-sh" x="-25%" y="-25%" width="150%" height="150%">
+        <feDropShadow dx="0" dy="6" stdDeviation="9" floodColor="#1e40af" floodOpacity="0.45" />
       </filter>
     </defs>
-    <ellipse cx="40" cy="66" rx="22" ry="4" fill="#1e40af" opacity="0.1" />
-    <ellipse cx="40" cy="61" rx="22" ry="6.5" fill="url(#ord-plate-g)" filter="url(#ord-drop)" />
-    <ellipse cx="40" cy="59.5" rx="18" ry="4.5" fill="white" opacity="0.35" />
-    <path d="M18 59 C18 36 26 21 40 19 C54 21 62 36 62 59 Z" fill="url(#ord-dome-g)" filter="url(#ord-drop)" />
-    <path d="M51 59 C51 38 56 26 62 24 L62 59 Z" fill="#93c5fd" opacity="0.22" />
-    <path d="M24 52 Q25 32 34 24" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.65" />
-    <rect x="37.5" y="13" width="5" height="7" rx="2.5" fill="url(#ord-handle-g)" />
-    <ellipse cx="40" cy="13" rx="5.5" ry="2.5" fill="#60a5fa" />
-    <path d="M30 17 Q28 12 30 7" stroke="#93c5fd" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7" />
-    <path d="M40 14 Q38 9 40 5" stroke="#93c5fd" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7" />
-    <path d="M50 17 Q52 12 50 7" stroke="#93c5fd" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7" />
+    {/* Glass disc */}
+    <circle cx="40" cy="40" r="33" fill="url(#ord-glass-g)" filter="url(#ord-sh)" />
+    {/* Outer ring */}
+    <circle cx="40" cy="40" r="33" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5" />
+    {/* Top glass sheen */}
+    <ellipse cx="38" cy="27" rx="19" ry="9.5" fill="rgba(255,255,255,0.28)" />
+    {/* Fork — 3 prongs */}
+    <line x1="29" y1="22" x2="29" y2="57" stroke="white" strokeWidth="2.8" strokeLinecap="round" />
+    <line x1="25" y1="22" x2="25" y2="31" stroke="white" strokeWidth="2" strokeLinecap="round" />
+    <line x1="33" y1="22" x2="33" y2="31" stroke="white" strokeWidth="2" strokeLinecap="round" />
+    <path d="M25 31 Q27 37 29 37 Q31 37 33 31" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    {/* Knife */}
+    <line x1="51" y1="22" x2="51" y2="57" stroke="white" strokeWidth="2.8" strokeLinecap="round" />
+    <path d="M51 22 C57 23 58 31 51 38" fill="rgba(255,255,255,0.75)" stroke="rgba(255,255,255,0.9)" strokeWidth="0.5" />
   </svg>
 );
 
 const KitchenIcon3D = () => (
   <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
-      <linearGradient id="kit-hat-g" x1="0.25" y1="0" x2="0.9" y2="1">
-        <stop offset="0%" stopColor="#ffffff" />
-        <stop offset="70%" stopColor="#f9fafb" />
-        <stop offset="100%" stopColor="#e5e7eb" />
-      </linearGradient>
-      <linearGradient id="kit-band-g" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="#fef3c7" />
-        <stop offset="100%" stopColor="#fbbf24" />
-      </linearGradient>
-      <linearGradient id="kit-flame-g" x1="0.3" y1="1" x2="0.7" y2="0">
-        <stop offset="0%" stopColor="#f59e0b" />
-        <stop offset="50%" stopColor="#f97316" />
-        <stop offset="100%" stopColor="#ef4444" stopOpacity="0.75" />
-      </linearGradient>
-      <filter id="kit-drop" x="-20%" y="-20%" width="140%" height="140%">
-        <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#78350f" floodOpacity="0.18" />
-      </filter>
-      <filter id="kit-glow" x="-40%" y="-40%" width="180%" height="180%">
-        <feGaussianBlur stdDeviation="2" result="b" />
-        <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+      <radialGradient id="kit-glass-g" cx="38%" cy="32%" r="68%" gradientUnits="userSpaceOnUse" fx="30" fy="26">
+        <stop offset="0%" stopColor="#fde68a" stopOpacity="0.95" />
+        <stop offset="100%" stopColor="#b45309" stopOpacity="0.9" />
+      </radialGradient>
+      <filter id="kit-sh" x="-25%" y="-25%" width="150%" height="150%">
+        <feDropShadow dx="0" dy="6" stdDeviation="9" floodColor="#92400e" floodOpacity="0.45" />
       </filter>
     </defs>
-    <ellipse cx="40" cy="67" rx="22" ry="4" fill="#78350f" opacity="0.1" />
-    <rect x="14" y="53" width="52" height="11" rx="5.5" fill="url(#kit-band-g)" filter="url(#kit-drop)" />
-    <rect x="17" y="55" width="46" height="6" rx="3" fill="#fde68a" opacity="0.45" />
-    <path d="M21 53 C19 31 27 17 40 15 C53 17 61 31 59 53 Z" fill="url(#kit-hat-g)" filter="url(#kit-drop)" />
-    <ellipse cx="40" cy="19" rx="17" ry="11" fill="white" opacity="0.88" />
-    <path d="M26 36 Q28 22 36 18" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.5" />
-    <path d="M52 53 C52 32 57 22 59 20 L59 53 Z" fill="#d1d5db" opacity="0.3" />
-    <path d="M34 70 Q30 61 35 56 Q34 64 39 61 Q35 55 40 49 Q46 56 43 62 Q48 59 46 68 Q43 73 40 71 Q37 72 34 70 Z" fill="url(#kit-flame-g)" filter="url(#kit-glow)" />
-    <path d="M38 68 Q36 63 38 60 Q39.5 63 41.5 61 Q40.5 65 40 68 Z" fill="#fef3c7" opacity="0.85" />
+    {/* Glass disc */}
+    <circle cx="40" cy="40" r="33" fill="url(#kit-glass-g)" filter="url(#kit-sh)" />
+    {/* Outer ring */}
+    <circle cx="40" cy="40" r="33" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5" />
+    {/* Top glass sheen */}
+    <ellipse cx="38" cy="27" rx="19" ry="9.5" fill="rgba(255,255,255,0.28)" />
+    {/* Chef hat dome */}
+    <path d="M25 45 C22 37 24 26 32 22 C35 20 36 18 40 18 C44 18 45 20 48 22 C56 26 58 37 55 45 Z"
+          fill="rgba(255,255,255,0.92)" />
+    {/* Hat dome inner highlight */}
+    <path d="M29 43 C27 36 29 27 35 24 C37 22.5 38 21.5 40 21.5 C41 21.5 43 22 45 24"
+          fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round" />
+    {/* Hat brim */}
+    <rect x="22" y="44" width="36" height="7" rx="3.5" fill="rgba(255,255,255,0.92)" />
+    {/* Steam lines */}
+    <path d="M33 54 Q31.5 58 33 61" stroke="rgba(255,255,255,0.75)" strokeWidth="2" strokeLinecap="round" fill="none" />
+    <path d="M40 54 Q38.5 58 40 61" stroke="rgba(255,255,255,0.75)" strokeWidth="2" strokeLinecap="round" fill="none" />
+    <path d="M47 54 Q45.5 58 47 61" stroke="rgba(255,255,255,0.75)" strokeWidth="2" strokeLinecap="round" fill="none" />
   </svg>
 );
 
