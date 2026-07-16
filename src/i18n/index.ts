@@ -550,5 +550,6 @@ export function getTranslations(lang: Language): Translations {
 }
 
 export function formatTableName(tableName: string, lang: Language): string {
-  return lang === 'hi' ? tableName.replace(/^Table\b/i, translations.hi.common.table) : tableName;
+  const match = lang === 'hi' ? tableName.match(/^Table\b/i) : null;
+  return match ? `${translations.hi.common.table}${tableName.slice(match[0].length)}` : tableName;
 }
