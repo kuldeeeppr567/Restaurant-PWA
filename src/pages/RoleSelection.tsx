@@ -6,7 +6,7 @@ import { loadDemoData, resetDemoData } from '../db/seedData.ts';
 import { useOnlineStatus } from '../hooks/useOnlineStatus.ts';
 
 const OrderIcon3D = () => (
-  <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <svg viewBox="0 0 80 80" width="100" height="100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
       <radialGradient id="ord-glass-g" cx="38%" cy="32%" r="68%" gradientUnits="userSpaceOnUse" fx="30" fy="26">
         <stop offset="0%" stopColor="#bfdbfe" stopOpacity="0.95" />
@@ -34,7 +34,7 @@ const OrderIcon3D = () => (
 );
 
 const KitchenIcon3D = () => (
-  <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <svg viewBox="0 0 80 80" width="100" height="100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
       <radialGradient id="kit-glass-g" cx="38%" cy="32%" r="68%" gradientUnits="userSpaceOnUse" fx="30" fy="26">
         <stop offset="0%" stopColor="#fde68a" stopOpacity="0.95" />
@@ -66,7 +66,7 @@ const KitchenIcon3D = () => (
 );
 
 const PaymentIcon3D = () => (
-  <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <svg viewBox="0 0 80 80" width="100" height="100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
       <linearGradient id="pay-back-g" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0%" stopColor="#10b981" />
@@ -107,7 +107,7 @@ const PaymentIcon3D = () => (
 );
 
 const AdminIcon3D = () => (
-  <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <svg viewBox="0 0 80 80" width="100" height="100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
       <linearGradient id="adm-screen-g" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0%" stopColor="#f5f3ff" />
@@ -324,21 +324,17 @@ export default function RoleSelection() {
 
       <div className="role-grid">
         {roles.map((r) => (
-          <motion.div
+          <motion.button
             key={r.key}
-            className={`card role-card role-card--${r.key}`}
+            className={`role-btn role-btn--${r.key}`}
             onClick={() => navigate(r.path)}
-            whileHover={{ y: -4 }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ duration: 0.2 }}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && navigate(r.path)}
+            whileHover={{ scale: 1.1, y: -8 }}
+            whileTap={{ scale: 0.82, rotateX: 12, rotateY: -8 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 18 }}
           >
             <div className="role-icon">{r.icon}</div>
             <h2>{text.roles[r.key].title}</h2>
-            <p className="page-subtitle">{text.roles[r.key].description}</p>
-          </motion.div>
+          </motion.button>
         ))}
       </div>
 
