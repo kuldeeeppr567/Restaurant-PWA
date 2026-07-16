@@ -1,9 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { CircleAlert, Receipt } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { loadDemoData, resetDemoData } from '../db/seedData.ts';
-import { useOnlineStatus } from '../hooks/useOnlineStatus.ts';
 
 const OrderIcon3D = () => (
   <svg viewBox="0 0 80 80" width="100" height="100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -171,23 +169,37 @@ const roles: RoleCard[] = [
 ];
 
 const languageStorageKey = 'restaurant-pwa-language';
-const footerIconStyle = { display: 'inline', marginRight: '6px', verticalAlign: '-2px' } as const;
+const NAVIGATION_ANIMATION_DELAY_MS = 280;
+const PARTICLE_TRAVEL_DISTANCE = 58;
+
+const roleIconWrapperStyle = {
+  position: 'relative' as const,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+
+const roleGlow: Record<RoleKey, string> = {
+  waiter: '37, 99, 235',
+  kitchen: '217, 119, 6',
+  cashier: '5, 150, 105',
+  admin: '124, 58, 237',
+};
+
+const particleAngles = [0, 60, 120, 180, 240, 300];
 
 const copy = {
   en: {
     languageLabel: 'Language',
     languageDisabledHint: 'Language selection is unavailable while demo data is updating.',
     title: 'Restaurant POS',
-    subtitle: 'Premium command center for service, kitchen, and billing workflows',
-    onlineStatus: 'Live sync available',
-    offlineStatus: 'Offline mode active',
+    subtitle: 'Command Centre',
     roles: {
       waiter: { title: 'Order', description: 'Take orders and serve tables' },
       kitchen: { title: 'Kitchen', description: 'Food Order Status' },
       cashier: { title: 'Payment', description: 'Billing and Payment' },
       admin: { title: 'Admin', description: 'Manage Settings' },
     },
-    footer: 'Demo mode: no authentication enabled.',
     loadDemo: 'Load Demo Data',
     loadingDemo: 'Loading...',
     resetDemo: 'Reset Demo Data',
@@ -203,16 +215,13 @@ const copy = {
     languageLabel: 'भाषा चुनें',
     languageDisabledHint: 'डेमो डेटा अपडेट होने के दौरान भाषा नहीं बदली जा सकती।',
     title: 'रेस्टोरेंट POS',
-    subtitle: 'सेवा, रसोई और बिलिंग वर्कफ़्लो के लिए प्रीमियम कमांड सेंटर',
-    onlineStatus: 'लाइव सिंक उपलब्ध है',
-    offlineStatus: 'ऑफलाइन मोड सक्रिय है',
+    subtitle: 'Command Centre',
     roles: {
       waiter: { title: 'ऑर्डर', description: 'ऑर्डर और टेबल सर्विस' },
       kitchen: { title: 'किचन', description: 'भोजन के ऑर्डर की स्थिति देखे' },
       cashier: { title: 'पेमेंट', description: 'बिलिंग और पेमेंट' },
       admin: { title: 'एडमिन', description: 'सेटिंग मैनेज करे' },
     },
-    footer: 'डेमो मोड: ऑथेंटिकेशन सक्षम नहीं है।',
     loadDemo: 'डेमो डेटा लोड करें',
     loadingDemo: 'लोड हो रहा है...',
     resetDemo: 'डेमो डेटा रीसेट करें',
@@ -229,10 +238,7 @@ const copy = {
   languageDisabledHint: string;
   title: string;
   subtitle: string;
-  onlineStatus: string;
-  offlineStatus: string;
   roles: Record<RoleKey, { title: string; description: string }>;
-  footer: string;
   loadDemo: string;
   loadingDemo: string;
   resetDemo: string;
@@ -247,17 +253,22 @@ const copy = {
 
 export default function RoleSelection() {
   const navigate = useNavigate();
-  const isOnline = useOnlineStatus();
   const [language, setLanguage] = useState<Language>(
     () => (window.localStorage.getItem(languageStorageKey) === 'hi' ? 'hi' : 'en')
   );
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  const [tappedRole, setTappedRole] = useState<RoleKey | null>(null);
   const text = copy[language];
   const isBusy = pendingAction !== null;
 
   const handleLanguageChange = (nextLanguage: Language) => {
     setLanguage(nextLanguage);
     window.localStorage.setItem(languageStorageKey, nextLanguage);
+  };
+
+  const handleRoleClick = (r: RoleCard) => {
+    setTappedRole(r.key);
+    setTimeout(() => navigate(r.path), NAVIGATION_ANIMATION_DELAY_MS);
   };
 
   const handleLoadDemo = async () => {
@@ -291,7 +302,6 @@ export default function RoleSelection() {
   return (
     <div className="page-container">
       <div className="role-hero">
-        <div className="role-logo"><Receipt size={28} /></div>
         <h1 className="page-title">{text.title}</h1>
         {text.subtitle && <p className="page-subtitle">{text.subtitle}</p>}
         <div className="role-language-selector">
@@ -315,11 +325,6 @@ export default function RoleSelection() {
             </p>
           )}
         </div>
-        <p className="role-status-text">
-          <span className={isOnline ? 'online-indicator' : 'offline-indicator'}>
-            {isOnline ? text.onlineStatus : text.offlineStatus}
-          </span>
-        </p>
       </div>
 
       <div className="role-grid">
@@ -327,22 +332,66 @@ export default function RoleSelection() {
           <motion.button
             key={r.key}
             className={`role-btn role-btn--${r.key}`}
-            onClick={() => navigate(r.path)}
-            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigate(r.path)}
+            onClick={() => handleRoleClick(r)}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleRoleClick(r)}
             whileHover={{ scale: 1.1, y: -8 }}
             whileTap={{ scale: 0.82, rotateX: 12, rotateY: -8 }}
             transition={{ type: 'spring', stiffness: 380, damping: 18 }}
           >
-            <div className="role-icon">{r.icon}</div>
+            <div style={roleIconWrapperStyle}>
+              <div className="role-icon">{r.icon}</div>
+              <AnimatePresence>
+                {tappedRole === r.key && (
+                  <>
+                    <motion.div
+                      key="glow"
+                      initial={{ opacity: 0, scale: 0.4 }}
+                      animate={{ opacity: 1, scale: 2.0 }}
+                      exit={{ opacity: 0, scale: 2.4 }}
+                      transition={{ duration: 0.45 }}
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        borderRadius: '50%',
+                        background: `radial-gradient(circle, rgba(${roleGlow[r.key]}, 0.65) 20%, transparent 70%)`,
+                        pointerEvents: 'none',
+                        zIndex: 0,
+                      }}
+                    />
+                    {particleAngles.map((angle, i) => (
+                      <motion.div
+                        key={`p-${i}`}
+                        initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+                        animate={{
+                          opacity: 0,
+                          x: Math.cos((angle * Math.PI) / 180) * PARTICLE_TRAVEL_DISTANCE,
+                          y: Math.sin((angle * Math.PI) / 180) * PARTICLE_TRAVEL_DISTANCE,
+                          scale: 0.4,
+                        }}
+                        transition={{ duration: 0.55, ease: 'easeOut' }}
+                        style={{
+                          position: 'absolute',
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          background: `rgba(${roleGlow[r.key]}, 0.95)`,
+                          top: '50%',
+                          left: '50%',
+                          marginTop: -4,
+                          marginLeft: -4,
+                          pointerEvents: 'none',
+                          zIndex: 10,
+                        }}
+                      />
+                    ))}
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
             <h2>{text.roles[r.key].title}</h2>
           </motion.button>
         ))}
       </div>
-
-      <p className="role-footer">
-        <CircleAlert size={16} style={footerIconStyle} />
-        {text.footer}
-      </p>
 
       <div className="role-actions">
         <button className="btn btn-primary" onClick={handleLoadDemo} disabled={isBusy}>
