@@ -23,7 +23,7 @@ describe('RoleSelection', () => {
     window.localStorage.clear();
   });
 
-  it('switches the main screen copy to Hindi from the language selector', async () => {
+  it('switches UI copy to Hindi from the language selector (subtitle stays as "Command Centre" in both languages)', async () => {
     const user = userEvent.setup();
 
     render(<RoleSelection />);
