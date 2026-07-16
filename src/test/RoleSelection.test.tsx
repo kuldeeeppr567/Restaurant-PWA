@@ -23,14 +23,14 @@ describe('RoleSelection', () => {
     window.localStorage.clear();
   });
 
-  it('switches the main screen copy to Hindi from the language selector', async () => {
+  it('switches UI copy to Hindi from the language selector (subtitle stays as "Command Centre" in both languages)', async () => {
     const user = userEvent.setup();
 
     render(<RoleSelection />);
 
     await user.selectOptions(screen.getByLabelText('Language'), 'hi');
 
-    expect(screen.getByText('सेवा, रसोई और बिलिंग वर्कफ़्लो के लिए प्रीमियम कमांड सेंटर')).toBeInTheDocument();
+    expect(screen.getByText('Command Centre')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'डेमो डेटा लोड करें' })).toBeInTheDocument();
     expect(window.localStorage.getItem('restaurant-pwa-language')).toBe('hi');
   });
