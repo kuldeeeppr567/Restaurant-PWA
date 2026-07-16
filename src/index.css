@@ -669,10 +669,10 @@ label {
   border-radius: 50%;
 }
 
-.role-btn--waiter .role-icon { filter: drop-shadow(0 6px 18px rgba(37,99,235,0.45)); }
-.role-btn--kitchen .role-icon { filter: drop-shadow(0 6px 18px rgba(217,119,6,0.45)); }
-.role-btn--cashier .role-icon { filter: drop-shadow(0 6px 18px rgba(5,150,105,0.45)); }
-.role-btn--admin .role-icon { filter: drop-shadow(0 6px 18px rgba(124,58,237,0.45)); }
+.role-btn--waiter .role-icon { --role-color: 37, 99, 235; }
+.role-btn--kitchen .role-icon { --role-color: 217, 119, 6; }
+.role-btn--cashier .role-icon { --role-color: 5, 150, 105; }
+.role-btn--admin .role-icon { --role-color: 124, 58, 237; }
 
 .role-btn h2 {
   margin: 0;
@@ -685,8 +685,14 @@ label {
 
 .role-icon {
   display: flex;
+  width: 116px;
+  height: 116px;
   align-items: center;
   justify-content: center;
+  border: 1px solid rgba(var(--role-color), 0.52);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.44), rgba(var(--role-color), 0.16) 58%, rgba(var(--role-color), 0.28));
+  box-shadow: 0 0 0 5px rgba(var(--role-color), 0.1), 0 0 24px rgba(var(--role-color), 0.46), inset 0 0 14px rgba(255, 255, 255, 0.35);
 }
 
 .role-footer {
