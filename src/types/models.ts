@@ -81,26 +81,26 @@ export interface Payment {
   paidAt: string;
 }
 
-const DEFAULT_SPECIAL_INSTRUCTIONS = ['Less spicy', 'No onion'];
-const LESS_SUGAR = 'Less sugar';
-const NO_SUGAR = 'No sugar';
-const SOUTH_INDIAN_CATEGORY = 'Indian > South Indian';
-const NORTH_INDIAN_CATEGORY = 'Indian > North Indian';
-const ITALIAN_CATEGORY = 'Global > Italian';
-const STREET_FOOD_CATEGORY = 'Global > Street Food';
-const INDO_CHINESE_CATEGORY = 'Asian > Indo-Chinese';
-const HOT_BEVERAGES_CATEGORY = 'Beverages > Hot';
-const COLD_BEVERAGES_CATEGORY = 'Beverages > Cold';
-const INDIAN_DESSERTS_CATEGORY = 'Desserts > Indian';
+const DEFAULT_SPECIAL_INSTRUCTIONS = ['कम मसालेदार', 'प्याज़ नहीं'];
+const LESS_SUGAR = 'कम चीनी';
+const NO_SUGAR = 'चीनी नहीं';
+const SOUTH_INDIAN_CATEGORY = 'भारतीय > दक्षिण भारतीय';
+const NORTH_INDIAN_CATEGORY = 'भारतीय > उत्तर भारतीय';
+const ITALIAN_CATEGORY = 'अंतर्राष्ट्रीय > इटालियन';
+const STREET_FOOD_CATEGORY = 'अंतर्राष्ट्रीय > स्ट्रीट फूड';
+const INDO_CHINESE_CATEGORY = 'एशियाई > इंडो-चाइनीज़';
+const HOT_BEVERAGES_CATEGORY = 'पेय पदार्थ > गरम';
+const COLD_BEVERAGES_CATEGORY = 'पेय पदार्थ > ठंडा';
+const INDIAN_DESSERTS_CATEGORY = 'मिठाई > भारतीय';
 
 const SPECIAL_INSTRUCTIONS_BY_CATEGORY: Record<string, string[]> = {
-  [SOUTH_INDIAN_CATEGORY]: ['Extra crispy', 'Less oil', 'Less spicy', 'Extra spicy', 'No onion'],
-  [NORTH_INDIAN_CATEGORY]: ['Less oil', 'Less spicy', 'Extra spicy', 'No onion', 'No garlic', 'Extra butter'],
-  [ITALIAN_CATEGORY]: ['Extra cheese', 'Less spicy', 'Extra spicy', 'No onion', 'No garlic', 'Well done'],
-  [STREET_FOOD_CATEGORY]: ['Extra crispy', 'Extra cheese', 'Less spicy', 'Extra spicy', 'No onion'],
-  [INDO_CHINESE_CATEGORY]: ['Less oil', 'Less spicy', 'Extra spicy', 'No onion', 'No garlic'],
-  [HOT_BEVERAGES_CATEGORY]: [LESS_SUGAR, NO_SUGAR, 'Extra hot'],
-  [COLD_BEVERAGES_CATEGORY]: [LESS_SUGAR, NO_SUGAR, 'Less ice', 'No ice'],
+  [SOUTH_INDIAN_CATEGORY]: ['अतिरिक्त कुरकुरा', 'कम तेल', 'कम मसालेदार', 'अतिरिक्त मसालेदार', 'प्याज़ नहीं'],
+  [NORTH_INDIAN_CATEGORY]: ['कम तेल', 'कम मसालेदार', 'अतिरिक्त मसालेदार', 'प्याज़ नहीं', 'लहसुन नहीं', 'अतिरिक्त मक्खन'],
+  [ITALIAN_CATEGORY]: ['अतिरिक्त चीज़', 'कम मसालेदार', 'अतिरिक्त मसालेदार', 'प्याज़ नहीं', 'लहसुन नहीं', 'अच्छी तरह पकाएं'],
+  [STREET_FOOD_CATEGORY]: ['अतिरिक्त कुरकुरा', 'अतिरिक्त चीज़', 'कम मसालेदार', 'अतिरिक्त मसालेदार', 'प्याज़ नहीं'],
+  [INDO_CHINESE_CATEGORY]: ['कम तेल', 'कम मसालेदार', 'अतिरिक्त मसालेदार', 'प्याज़ नहीं', 'लहसुन नहीं'],
+  [HOT_BEVERAGES_CATEGORY]: [LESS_SUGAR, NO_SUGAR, 'अतिरिक्त गरम'],
+  [COLD_BEVERAGES_CATEGORY]: [LESS_SUGAR, NO_SUGAR, 'कम बर्फ़', 'बर्फ़ नहीं'],
   [INDIAN_DESSERTS_CATEGORY]: [LESS_SUGAR],
 };
 
@@ -109,37 +109,37 @@ export function getSpecialInstructionsForCategory(category: string): string[] {
 }
 
 export const SERVICE_REQUEST_LABELS: Record<ServiceRequestType, string> = {
-  chutney: 'Chutney Refill',
-  sambhar: 'Sambhar Refill',
-  water: 'Water',
-  plates_spoons: 'Plates/Spoons',
-  table_cleaning: 'Table Cleaning',
-  other: 'Other Request',
+  chutney: 'चटनी भरें',
+  sambhar: 'सांभर भरें',
+  water: 'पानी',
+  plates_spoons: 'प्लेट/चम्मच',
+  table_cleaning: 'टेबल सफाई',
+  other: 'अन्य अनुरोध',
 };
 
 export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
-  cash: 'Cash',
+  cash: 'नकद',
   phonepe: 'PhonePe',
   paytm: 'Paytm',
-  other_upi: 'Other UPI',
-  card: 'Card',
-  mixed: 'Mixed',
+  other_upi: 'अन्य UPI',
+  card: 'कार्ड',
+  mixed: 'मिश्रित',
 };
 
 export const TABLE_STATUS_LABELS: Record<TableStatus, string> = {
-  available: 'Available',
-  occupied: 'Occupied',
-  order_in_progress: 'Order In Progress',
-  billing_requested: 'Billing Requested',
-  paid: 'Paid',
-  ready_for_cleaning: 'Ready for Cleaning',
+  available: 'उपलब्ध',
+  occupied: 'उपयोग में',
+  order_in_progress: 'ऑर्डर जारी',
+  billing_requested: 'बिल माँगा',
+  paid: 'भुगतान हो गया',
+  ready_for_cleaning: 'सफाई के लिए तैयार',
 };
 
 export const ORDER_STATUS_LABELS: Record<OrderItemStatus, string> = {
-  draft: 'Draft',
-  submitted: 'Submitted',
-  preparing: 'Preparing',
-  ready: 'Ready',
-  served: 'Served',
-  cancelled: 'Cancelled',
+  draft: 'ड्राफ्ट',
+  submitted: 'भेजा गया',
+  preparing: 'बन रहा है',
+  ready: 'तैयार',
+  served: 'परोसा गया',
+  cancelled: 'रद्द',
 };
