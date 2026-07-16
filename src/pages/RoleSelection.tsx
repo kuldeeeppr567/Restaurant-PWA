@@ -169,6 +169,15 @@ const roles: RoleCard[] = [
 ];
 
 const languageStorageKey = 'restaurant-pwa-language';
+const NAVIGATION_ANIMATION_DELAY_MS = 280;
+const PARTICLE_TRAVEL_DISTANCE = 58;
+
+const roleIconWrapperStyle = {
+  position: 'relative' as const,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
 
 const roleGlow: Record<RoleKey, string> = {
   waiter: '37, 99, 235',
@@ -259,7 +268,7 @@ export default function RoleSelection() {
 
   const handleRoleClick = (r: RoleCard) => {
     setTappedRole(r.key);
-    setTimeout(() => navigate(r.path), 280);
+    setTimeout(() => navigate(r.path), NAVIGATION_ANIMATION_DELAY_MS);
   };
 
   const handleLoadDemo = async () => {
@@ -329,7 +338,7 @@ export default function RoleSelection() {
             whileTap={{ scale: 0.82, rotateX: 12, rotateY: -8 }}
             transition={{ type: 'spring', stiffness: 380, damping: 18 }}
           >
-            <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={roleIconWrapperStyle}>
               <div className="role-icon">{r.icon}</div>
               <AnimatePresence>
                 {tappedRole === r.key && (
@@ -355,8 +364,8 @@ export default function RoleSelection() {
                         initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
                         animate={{
                           opacity: 0,
-                          x: Math.cos((angle * Math.PI) / 180) * 58,
-                          y: Math.sin((angle * Math.PI) / 180) * 58,
+                          x: Math.cos((angle * Math.PI) / 180) * PARTICLE_TRAVEL_DISTANCE,
+                          y: Math.sin((angle * Math.PI) / 180) * PARTICLE_TRAVEL_DISTANCE,
                           scale: 0.4,
                         }}
                         transition={{ duration: 0.55, ease: 'easeOut' }}
