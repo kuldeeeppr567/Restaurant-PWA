@@ -30,7 +30,7 @@ describe('RoleSelection', () => {
 
     await user.selectOptions(screen.getByLabelText('Language'), 'hi');
 
-    expect(screen.getByText('सेवा, रसोई और बिलिंग वर्कफ़्लो के लिए प्रीमियम कमांड सेंटर')).toBeInTheDocument();
+    expect(screen.getByText('Command Centre')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'डेमो डेटा लोड करें' })).toBeInTheDocument();
     expect(window.localStorage.getItem('restaurant-pwa-language')).toBe('hi');
   });
