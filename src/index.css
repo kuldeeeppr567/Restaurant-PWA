@@ -634,56 +634,59 @@ label {
 
 .role-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px 24px;
   margin-bottom: var(--spacing-3);
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.role-card {
-  text-align: center;
+@media (min-width: 640px) {
+  .role-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.role-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: none;
+  border: none;
   cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(28px) saturate(1.6);
-  -webkit-backdrop-filter: blur(28px) saturate(1.6);
-  border: 1px solid rgba(255, 255, 255, 0.42);
-  box-shadow:
-    0 8px 32px rgba(15, 23, 42, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    inset 0 -1px 0 rgba(148, 163, 184, 0.08);
+  padding: 12px 8px;
+  perspective: 600px;
+  transform-style: preserve-3d;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.role-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  border-radius: 4px 4px 0 0;
+.role-btn:focus-visible .role-icon {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.45);
+  border-radius: 50%;
 }
 
-.role-card--waiter { background: linear-gradient(160deg, rgba(255,255,255,0.18), rgba(37,99,235,0.1)); }
-.role-card--waiter::before { background: linear-gradient(90deg, #2563eb, #60a5fa); }
-.role-card--kitchen { background: linear-gradient(160deg, rgba(255,255,255,0.18), rgba(217,119,6,0.1)); }
-.role-card--kitchen::before { background: linear-gradient(90deg, #d97706, #fbbf24); }
-.role-card--cashier { background: linear-gradient(160deg, rgba(255,255,255,0.18), rgba(5,150,105,0.1)); }
-.role-card--cashier::before { background: linear-gradient(90deg, #059669, #34d399); }
-.role-card--admin { background: linear-gradient(160deg, rgba(255,255,255,0.18), rgba(124,58,237,0.1)); }
-.role-card--admin::before { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+.role-btn--waiter .role-icon { filter: drop-shadow(0 6px 18px rgba(37,99,235,0.45)); }
+.role-btn--kitchen .role-icon { filter: drop-shadow(0 6px 18px rgba(217,119,6,0.45)); }
+.role-btn--cashier .role-icon { filter: drop-shadow(0 6px 18px rgba(5,150,105,0.45)); }
+.role-btn--admin .role-icon { filter: drop-shadow(0 6px 18px rgba(124,58,237,0.45)); }
 
-.role-card h2 {
-  margin-bottom: 4px;
-  font-size: 1.1rem;
+.role-btn h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 6px rgba(15, 23, 42, 0.18);
+  color: var(--text-primary, #0f172a);
 }
 
 .role-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 8px auto 16px;
-  filter: drop-shadow(0 4px 8px rgba(15, 23, 42, 0.08));
 }
 
 .role-footer {
