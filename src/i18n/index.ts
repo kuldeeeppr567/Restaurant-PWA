@@ -106,6 +106,8 @@ const translations = {
       addToOrder: (count: number) => `Add ${count} Item(s) to Order`,
       tableNotFound: 'Table not found.',
       customNotes: 'Custom notes...',
+      uncategorized: 'Uncategorized',
+      general: 'General',
     },
     serviceDashboard: {
       title: 'Service Requests',
@@ -370,6 +372,8 @@ const translations = {
       addToOrder: (count: number) => `ऑर्डर में ${count} आइटम जोड़ें`,
       tableNotFound: 'टेबल नहीं मिली।',
       customNotes: 'विशेष निर्देश...',
+      uncategorized: 'अवर्गीकृत',
+      general: 'सामान्य',
     },
     serviceDashboard: {
       title: 'सेवा अनुरोध',

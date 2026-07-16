@@ -16,13 +16,10 @@ interface DraftItem {
   customNotes: string;
 }
 
-const FALLBACK_BROAD_CATEGORY = 'Uncategorized';
-const FALLBACK_SUB_CATEGORY = 'General';
-
-function splitCategory(category: string): { broad: string; sub: string } {
+function splitCategory(category: string, fallbackBroad: string, fallbackSub: string): { broad: string; sub: string } {
   const [broad, ...rest] = category.split('>').map((part) => part.trim()).filter(Boolean);
-  if (!broad) return { broad: FALLBACK_BROAD_CATEGORY, sub: FALLBACK_SUB_CATEGORY };
-  if (rest.length === 0) return { broad, sub: FALLBACK_SUB_CATEGORY };
+  if (!broad) return { broad: fallbackBroad, sub: fallbackSub };
+  if (rest.length === 0) return { broad, sub: fallbackSub };
   return { broad, sub: rest.join(' > ') };
 }
 
@@ -118,7 +115,7 @@ export default function OrderPage() {
   const openPicker = useCallback(async () => {
     const available = await menuRepository.getAvailable();
     const tree = available.reduce<Record<string, Set<string>>>((acc, item) => {
-      const { broad, sub } = splitCategory(item.category);
+      const { broad, sub } = splitCategory(item.category, t.orderPage.uncategorized, t.orderPage.general);
       if (!acc[broad]) acc[broad] = new Set<string>();
       acc[broad].add(sub);
       return acc;
@@ -245,7 +242,7 @@ export default function OrderPage() {
 
   const statusOrder: OrderItemStatus[] = ['draft', 'submitted', 'preparing', 'ready', 'served', 'cancelled'];
   const filteredMenuItems = menuItems.filter((menuItem) => {
-    const { broad, sub } = splitCategory(menuItem.category);
+    const { broad, sub } = splitCategory(menuItem.category, t.orderPage.uncategorized, t.orderPage.general);
     return broad === selectedBroadCategory && sub === selectedSubCategory;
   });
 

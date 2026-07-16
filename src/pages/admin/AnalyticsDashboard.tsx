@@ -18,7 +18,6 @@ import { analyticsRepository } from '../../repositories/analyticsRepository.ts';
 import { tableRepository } from '../../repositories/tableRepository.ts';
 import { orderRepository } from '../../repositories/orderRepository.ts';
 import { serviceRequestRepository } from '../../repositories/serviceRequestRepository.ts';
-import { PAYMENT_METHOD_LABELS } from '../../types/index.ts';
 import type { Payment, PaymentMethod } from '../../types/index.ts';
 import { useLanguage } from '../../hooks/useLanguage.ts';
 
@@ -93,14 +92,14 @@ export default function AnalyticsDashboard() {
     setSalesByMethod(
       byMethod.map((m) => ({
         ...m,
-        method: PAYMENT_METHOD_LABELS[m.method as PaymentMethod] || m.method,
+        method: t.paymentMethod[m.method as PaymentMethod] || m.method,
       }))
     );
     setRevenueByItem(byItem.slice(0, 10));
     setRecentBills(bills);
     setAvgPrepTime(prepTime);
     setLoading(false);
-  }, [getDays]);
+  }, [getDays, t]);
 
   useEffect(() => {
     loadData();

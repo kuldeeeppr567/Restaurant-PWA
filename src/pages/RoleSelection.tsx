@@ -214,13 +214,13 @@ const copy = {
   hi: {
     languageLabel: 'भाषा चुनें',
     languageDisabledHint: 'डेमो डेटा अपडेट होने के दौरान भाषा नहीं बदली जा सकती।',
-    title: 'Order Management App',
-    subtitle: 'Command Centre',
+    title: 'ऑर्डर मैनेजमेंट ऐप',
+    subtitle: 'कमांड सेंटर',
     roles: {
       waiter: { title: 'ऑर्डर', description: 'ऑर्डर और टेबल सर्विस' },
-      kitchen: { title: 'किचन', description: 'Bhojan taiyaari ki suchna dekhe' },
+      kitchen: { title: 'किचन', description: 'भोजन तैयारी की सूचना देखें' },
       cashier: { title: 'पेमेंट', description: 'बिलिंग और पेमेंट' },
-      admin: { title: 'एडमिन', description: 'सेटिंग मैनेज करे' },
+      admin: { title: 'एडमिन', description: 'सेटिंग मैनेज करें' },
     },
     loadDemo: 'डेमो डेटा लोड करें',
     loadingDemo: 'लोड हो रहा है...',
