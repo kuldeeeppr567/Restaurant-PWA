@@ -47,6 +47,7 @@ export default function TableDashboard() {
       await tableRepository.updateStatus(table.id!, 'available', sessionId);
       navigate(`/waiter/table/${table.id}`);
     } else if (table.status === 'occupied' || table.status === 'order_in_progress') {
+      alert(t.tableStatus[table.status as TableStatus]);
       navigate(`/waiter/table/${table.id}`);
     } else if (table.status === 'billing_requested') {
       alert(t.tableDashboard.billingAlert);

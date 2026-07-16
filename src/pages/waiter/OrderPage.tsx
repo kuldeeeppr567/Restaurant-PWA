@@ -266,7 +266,7 @@ export default function OrderPage() {
         const statusLabel = t.orderStatus[status as OrderItemStatus] ?? status;
         return (
           <div key={status} style={{ marginBottom: '1rem' }}>
-            <h3>{statusLabel} ({items.length})</h3>
+            {status !== 'draft' && <h3>{statusLabel} ({items.length})</h3>}
             {items.map((item) => (
               <div key={item.id} className="card" style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>

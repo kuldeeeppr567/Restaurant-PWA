@@ -89,18 +89,18 @@ describe('Billing calculations', () => {
 
 describe('Category-driven instructions', () => {
   it('returns South Indian instructions for dosa-style items', () => {
-    expect(getSpecialInstructionsForCategory('Indian > South Indian')).toEqual(
-      expect.arrayContaining(['Extra crispy', 'Less oil'])
+    expect(getSpecialInstructionsForCategory('भारतीय > दक्षिण भारतीय')).toEqual(
+      expect.arrayContaining(['अतिरिक्त कुरकुरा', 'कम तेल'])
     );
   });
 
   it('returns beverage-specific instructions for cold drinks', () => {
-    expect(getSpecialInstructionsForCategory('Beverages > Cold')).toEqual(
-      expect.arrayContaining(['Less sugar', 'No ice'])
+    expect(getSpecialInstructionsForCategory('पेय पदार्थ > ठंडा')).toEqual(
+      expect.arrayContaining(['कम चीनी', 'बर्फ़ नहीं'])
     );
   });
 
   it('falls back to a safe default for unknown categories', () => {
-    expect(getSpecialInstructionsForCategory('Custom > Specials')).toEqual(['Less spicy', 'No onion']);
+    expect(getSpecialInstructionsForCategory('Custom > Specials')).toEqual(['कम मसालेदार', 'प्याज़ नहीं']);
   });
 });
