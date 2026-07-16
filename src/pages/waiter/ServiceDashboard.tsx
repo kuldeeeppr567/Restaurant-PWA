@@ -4,7 +4,7 @@ import { serviceRequestRepository } from '../../repositories/serviceRequestRepos
 import { tableRepository } from '../../repositories/tableRepository.ts';
 import { sessionRepository } from '../../repositories/sessionRepository.ts';
 import { useLanguage } from '../../hooks/useLanguage.ts';
-import { timeAgo } from '../../i18n/index.ts';
+import { timeAgo, formatTableName } from '../../i18n/index.ts';
 
 export default function ServiceDashboard() {
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
@@ -75,7 +75,7 @@ export default function ServiceDashboard() {
           {requests.map((req) => (
             <div key={req.id} className="card" style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <strong>{req.tableName}</strong>
+                <strong>{formatTableName(req.tableName, lang)}</strong>
                 <span className="badge badge-info" style={{ marginLeft: '0.5rem' }}>
                   {t.serviceType[req.type as ServiceRequestType] ?? req.type}
                 </span>
@@ -104,7 +104,7 @@ export default function ServiceDashboard() {
           >
             <option value="">{t.serviceDashboard.selectTable}</option>
             {occupiedTables.map((tbl) => (
-              <option key={tbl.id} value={tbl.id}>{tbl.name}</option>
+              <option key={tbl.id} value={tbl.id}>{formatTableName(tbl.name, lang)}</option>
             ))}
           </select>
         </div>

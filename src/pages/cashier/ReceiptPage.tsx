@@ -6,11 +6,12 @@ import { paymentRepository } from '../../repositories/paymentRepository.ts';
 import { tableRepository } from '../../repositories/tableRepository.ts';
 import type { DiningSession, OrderItem, Payment } from '../../types/index.ts';
 import { useLanguage } from '../../hooks/useLanguage.ts';
+import { formatTableName } from '../../i18n/index.ts';
 
 export default function ReceiptPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
   const [session, setSession] = useState<DiningSession | null>(null);
   const [items, setItems] = useState<OrderItem[]>([]);
   const [payment, setPayment] = useState<Payment | null>(null);
@@ -65,7 +66,7 @@ export default function ReceiptPage() {
           <p className="text-gray-500">
             {paidDate.toLocaleDateString()} {paidDate.toLocaleTimeString()}
           </p>
-          <p className="font-semibold">{tableName}</p>
+          <p className="font-semibold">{formatTableName(tableName, lang)}</p>
         </div>
 
         <table className="w-full mb-3">

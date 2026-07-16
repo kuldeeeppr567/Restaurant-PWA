@@ -51,7 +51,7 @@ export default function TableDashboard() {
     } else if (table.status === 'billing_requested') {
       alert(t.tableDashboard.billingAlert);
     } else if (table.status === 'ready_for_cleaning') {
-      if (window.confirm(t.tableDashboard.confirmMark(table.name))) {
+      if (window.confirm(t.tableDashboard.confirmMark(formatTableName(table.name, lang)))) {
         await tableRepository.resetTable(table.id!);
         fetchTables();
       }
