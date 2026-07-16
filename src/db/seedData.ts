@@ -1,5 +1,6 @@
 import { db } from './database.ts';
 import type { MenuItem, RestaurantTable, DiningSession, OrderItem, ServiceRequest, Payment, PaymentMethod } from '../types/index.ts';
+import type { Language } from '../i18n/index.ts';
 
 function daysAgo(days: number, hoursOffset = 0): string {
   const d = new Date();
@@ -56,6 +57,45 @@ const menuItemsData: Omit<MenuItem, 'id'>[] = [
   { name: 'रसमलाई', category: 'मिठाई > भारतीय', price: 95, available: true, archived: false, createdAt: now, updatedAt: now },
 ];
 
+const englishDemoContent: Record<string, string> = {
+  'मसाला डोसा': 'Masala Dosa',
+  'इडली सांभर': 'Idli Sambar',
+  'मेदू वड़ा': 'Medu Vada',
+  'रवा डोसा': 'Rava Dosa',
+  'पनीर बटर मसाला': 'Paneer Butter Masala',
+  'दाल तड़का': 'Dal Tadka',
+  'वेज बिरयानी': 'Veg Biryani',
+  'बटर नान': 'Butter Naan',
+  'मार्गेरिटा पिज़्ज़ा': 'Margherita Pizza',
+  'वेजी पास्ता': 'Veggie Pasta',
+  'व्हाइट सॉस पास्ता': 'White Sauce Pasta',
+  'वेज बर्गर': 'Veg Burger',
+  'ग्रिल्ड सैंडविच': 'Grilled Sandwich',
+  'वेज मैगी': 'Veg Maggi',
+  'फ्रेंच फ्राइज़': 'French Fries',
+  'हक्का नूडल्स': 'Hakka Noodles',
+  'चिल्ली पनीर': 'Chilli Paneer',
+  'वेज मंचूरियन': 'Veg Manchurian',
+  'मसाला चाय': 'Masala Chai',
+  'फ़िल्टर कॉफ़ी': 'Filter Coffee',
+  'फ्रेश लाइम सोडा': 'Fresh Lime Soda',
+  'मैंगो शेक': 'Mango Shake',
+  'गुलाब जामुन': 'Gulab Jamun',
+  'रसमलाई': 'Rasmalai',
+  'भारतीय > दक्षिण भारतीय': 'Indian > South Indian',
+  'भारतीय > उत्तर भारतीय': 'Indian > North Indian',
+  'विश्व > इटालियन': 'World > Italian',
+  'विश्व > स्ट्रीट फूड': 'World > Street Food',
+  'एशियाई > इंडो-चाइनीज़': 'Asian > Indo-Chinese',
+  'पेय पदार्थ > गरम': 'Beverages > Hot',
+  'पेय पदार्थ > ठंडा': 'Beverages > Cold',
+  'मिठाई > भारतीय': 'Desserts > Indian',
+  'ज़्यादा कुरकुरा': 'Extra crispy',
+  'कम मसालेदार': 'Less spicy',
+  'पीने का पानी चाहिए': 'Drinking water requested',
+  'अतिरिक्त प्लेट चाहिए': 'Extra plates requested',
+};
+
 interface DemoOrder {
   name: string;
   qty: number;
@@ -63,7 +103,10 @@ interface DemoOrder {
   specialInstructions?: string[];
 }
 
-export async function loadDemoData(): Promise<void> {
+export async function loadDemoData(language: Language = 'en'): Promise<void> {
+  const localize = (value: string) => language === 'hi' ? value : (englishDemoContent[value] ?? value);
+  const tableName = (tableNumber: number) => language === 'hi' ? `टेबल ${tableNumber}` : `Table ${tableNumber}`;
+
   await db.transaction('rw', [db.menuItems, db.restaurantTables, db.diningSessions, db.orderItems, db.serviceRequests, db.payments], async () => {
     // Clear all tables
     await db.menuItems.clear();
@@ -74,13 +117,17 @@ export async function loadDemoData(): Promise<void> {
     await db.payments.clear();
 
     // Insert menu items
-    await db.menuItems.bulkAdd(menuItemsData as MenuItem[]);
+    await db.menuItems.bulkAdd(menuItemsData.map((item) => ({
+      ...item,
+      name: localize(item.name),
+      category: localize(item.category),
+    })) as MenuItem[]);
 
     const insertedItems = await db.menuItems.toArray();
     const menuByName = new Map(insertedItems.map((item) => [item.name, item]));
 
     const resolveMenu = (name: string) => {
-      const item = menuByName.get(name);
+      const item = menuByName.get(localize(name));
       if (!item?.id) {
         throw new Error(`Demo menu item not found: ${name}. Check that the item exists in menuItemsData.`);
       }
@@ -114,21 +161,21 @@ export async function loadDemoData(): Promise<void> {
     // --- Active sessions ---
     const session1Id = await db.diningSessions.add({
       tableId: 1,
-      tableName: 'टेबल 1',
+      tableName: tableName(1),
       openedAt: minutesAgo(45),
       status: 'occupied',
     } as DiningSession);
 
     const session2Id = await db.diningSessions.add({
       tableId: 3,
-      tableName: 'टेबल 3',
+      tableName: tableName(3),
       openedAt: minutesAgo(30),
       status: 'occupied',
     } as DiningSession);
 
     const session3Id = await db.diningSessions.add({
       tableId: 5,
-      tableName: 'टेबल 5',
+      tableName: tableName(5),
       openedAt: minutesAgo(60),
       status: 'billing_requested',
     } as DiningSession);
@@ -141,18 +188,18 @@ export async function loadDemoData(): Promise<void> {
       if (i === 1) { status = 'occupied'; currentSessionId = session1Id as number; }
       if (i === 3) { status = 'occupied'; currentSessionId = session2Id as number; }
       if (i === 5) { status = 'billing_requested'; currentSessionId = session3Id as number; }
-      tablesData.push({ name: `टेबल ${i}`, status, capacity: 4, currentSessionId });
+      tablesData.push({ name: tableName(i), status, capacity: 4, currentSessionId });
     }
     await db.restaurantTables.bulkAdd(tablesData as RestaurantTable[]);
 
     // --- Active order items ---
     await addOrderItems(session1Id as number, 1, minutesAgo(40), [
-      { name: 'मसाला डोसा', qty: 2, status: 'submitted', specialInstructions: ['ज़्यादा कुरकुरा'] },
+      { name: 'मसाला डोसा', qty: 2, status: 'submitted', specialInstructions: [localize('ज़्यादा कुरकुरा')] },
       { name: 'फ़िल्टर कॉफ़ी', qty: 2, status: 'submitted' },
     ]);
 
     await addOrderItems(session2Id as number, 3, minutesAgo(25), [
-      { name: 'मार्गेरिटा पिज़्ज़ा', qty: 1, status: 'preparing', specialInstructions: ['कम मसालेदार'] },
+      { name: 'मार्गेरिटा पिज़्ज़ा', qty: 1, status: 'preparing', specialInstructions: [localize('कम मसालेदार')] },
       { name: 'फ्रेश लाइम सोडा', qty: 1, status: 'ready' },
     ]);
 
@@ -164,8 +211,8 @@ export async function loadDemoData(): Promise<void> {
 
     // --- Service requests ---
     await db.serviceRequests.bulkAdd([
-      { sessionId: session1Id as number, tableId: 1, tableName: 'टेबल 1', type: 'water', notes: 'पीने का पानी चाहिए', requestedAt: minutesAgo(10), completed: false },
-      { sessionId: session2Id as number, tableId: 3, tableName: 'टेबल 3', type: 'plates_spoons', notes: 'अतिरिक्त प्लेट चाहिए', requestedAt: minutesAgo(5), completed: false },
+      { sessionId: session1Id as number, tableId: 1, tableName: tableName(1), type: 'water', notes: localize('पीने का पानी चाहिए'), requestedAt: minutesAgo(10), completed: false },
+      { sessionId: session2Id as number, tableId: 3, tableName: tableName(3), type: 'plates_spoons', notes: localize('अतिरिक्त प्लेट चाहिए'), requestedAt: minutesAgo(5), completed: false },
     ] as ServiceRequest[]);
 
     // --- Historical sessions (15 completed, past 7 days) ---
@@ -203,7 +250,7 @@ export async function loadDemoData(): Promise<void> {
 
       const sessionId = await db.diningSessions.add({
         tableId: entry.tableNum,
-        tableName: `टेबल ${entry.tableNum}`,
+        tableName: tableName(entry.tableNum),
         openedAt,
         closedAt,
         status: 'paid',

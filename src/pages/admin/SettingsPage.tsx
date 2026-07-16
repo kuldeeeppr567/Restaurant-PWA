@@ -7,7 +7,7 @@ export default function SettingsPage() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [loadingDemo, setLoadingDemo] = useState(false);
   const [resetting, setResetting] = useState(false);
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -32,7 +32,7 @@ export default function SettingsPage() {
     if (!window.confirm(t.settingsPage.confirmLoad)) return;
     setLoadingDemo(true);
     try {
-      await loadDemoData();
+      await loadDemoData(lang);
       alert(t.settingsPage.loadSuccess);
     } catch (err) {
       alert(t.settingsPage.loadError(err instanceof Error ? err.message : String(err)));

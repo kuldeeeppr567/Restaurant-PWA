@@ -276,7 +276,7 @@ export default function RoleSelection() {
     if (!window.confirm(text.loadDemoConfirm)) return;
     setPendingAction('load');
     try {
-      await loadDemoData();
+      await loadDemoData(language);
       alert(text.loadDemoSuccess);
     } catch (err) {
       alert(text.loadDemoError + (err instanceof Error ? err.message : String(err)));
