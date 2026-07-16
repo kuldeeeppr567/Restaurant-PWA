@@ -6,12 +6,13 @@ import type { RestaurantTable, TableStatus } from '../../types/index.ts';
 import { tableRepository } from '../../repositories/tableRepository.ts';
 import { sessionRepository } from '../../repositories/sessionRepository.ts';
 import { useLanguage } from '../../hooks/useLanguage.ts';
+import { formatTableName } from '../../i18n/index.ts';
 
 type TableFilter = 'all' | 'available' | 'occupied';
 
 export default function TableDashboard() {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
   const [tables, setTables] = useState<RestaurantTable[]>([]);
   const [filter, setFilter] = useState<TableFilter>('all');
   const [loading, setLoading] = useState(true);
@@ -98,7 +99,7 @@ export default function TableDashboard() {
                 whileTap={{ scale: 0.98 }}
                 transition={{ duration: 0.22 }}
               >
-                <h2>{table.name}</h2>
+                <h2>{formatTableName(table.name, lang)}</h2>
                 <div style={{ marginTop: 'var(--spacing-1)', marginBottom: 'var(--spacing-1)' }}>
                   <span className={`status-badge ${statusClass}`}>{statusLabel}</span>
                 </div>

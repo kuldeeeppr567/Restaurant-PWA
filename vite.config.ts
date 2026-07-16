@@ -11,9 +11,9 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'Dosa Restaurant POS',
-        short_name: 'DosaPOS',
-        description: 'Point of Sale PWA for a dosa restaurant',
+        name: 'Order Management App',
+        short_name: 'Order App',
+        description: 'Order Management App',
         theme_color: '#e65100',
         background_color: '#fff3e0',
         display: 'standalone',

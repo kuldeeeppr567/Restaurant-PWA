@@ -192,7 +192,7 @@ const copy = {
   en: {
     languageLabel: 'Language',
     languageDisabledHint: 'Language selection is unavailable while demo data is updating.',
-    title: 'Restaurant POS',
+    title: 'Order Management App',
     subtitle: 'Command Centre',
     roles: {
       waiter: { title: 'Order', description: 'Take orders and serve tables' },
@@ -214,11 +214,11 @@ const copy = {
   hi: {
     languageLabel: 'भाषा चुनें',
     languageDisabledHint: 'डेमो डेटा अपडेट होने के दौरान भाषा नहीं बदली जा सकती।',
-    title: 'रेस्टोरेंट POS',
+    title: 'Order Management App',
     subtitle: 'Command Centre',
     roles: {
       waiter: { title: 'ऑर्डर', description: 'ऑर्डर और टेबल सर्विस' },
-      kitchen: { title: 'किचन', description: 'भोजन के ऑर्डर की स्थिति देखे' },
+      kitchen: { title: 'किचन', description: 'Bhojan taiyaari ki suchna dekhe' },
       cashier: { title: 'पेमेंट', description: 'बिलिंग और पेमेंट' },
       admin: { title: 'एडमिन', description: 'सेटिंग मैनेज करे' },
     },
