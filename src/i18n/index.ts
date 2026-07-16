@@ -281,21 +281,21 @@ const translations = {
   hi: {
     common: {
       loading: 'लोड हो रहा है...',
-      back: 'पीछे जाएँ',
+      back: 'Piche Jaye',
       save: 'सेव करें',
       cancel: 'रद्द करें',
       edit: 'संपादित',
       delete: 'हटाएं',
       all: 'सभी',
       capacity: 'क्षमता',
-      table: 'टेबल',
+      table: 'Tebal',
       online: 'ऑनलाइन',
       offline: 'ऑफलाइन',
       home: 'होम',
     },
     tableStatus: {
       available: 'उपलब्ध',
-      occupied: 'उपयोग में',
+      occupied: 'Upyog me',
       order_in_progress: 'ऑर्डर जारी',
       billing_requested: 'बिल माँगा',
       paid: 'भुगतान हो गया',
@@ -350,7 +350,7 @@ const translations = {
     tableDashboard: {
       title: 'टेबल',
       subtitle: 'सेवा जारी रखने के लिए टेबल चुनें',
-      filterOccupied: 'उपयोग में',
+      filterOccupied: 'Upyog me',
       filterAvailable: 'उपलब्ध',
       noTables: 'कोई टेबल नहीं मिली। होम पेज से डेमो डेटा लोड करें।',
       noMatch: 'इस फ़िल्टर से कोई टेबल नहीं मिली।',
@@ -385,7 +385,7 @@ const translations = {
     },
     kitchenDisplay: {
       title: 'रसोई कतार',
-      subtitle: 'भोजन तैयारी की सूचना देखें',
+      subtitle: 'Bhojan taiyaari ki suchna dekhe',
       noItems: 'कतार में कोई आइटम नहीं।',
       loadingQueue: 'रसोई कतार लोड हो रही है...',
       filterPending: 'प्रतीक्षारत',
