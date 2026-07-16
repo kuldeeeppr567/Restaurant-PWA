@@ -550,6 +550,6 @@ export function getTranslations(lang: Language): Translations {
 }
 
 export function formatTableName(tableName: string, lang: Language): string {
-  const match = lang === 'hi' ? tableName.match(/^Table\b/i) : null;
+  const match = lang === 'hi' ? tableName.match(/^Table\b/) : null;
   return match ? `${translations[lang].common.table}${tableName.slice(match[0].length)}` : tableName;
 }
