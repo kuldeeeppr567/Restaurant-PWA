@@ -84,14 +84,14 @@ export interface Payment {
 const DEFAULT_SPECIAL_INSTRUCTIONS = ['Less spicy', 'No onion'];
 const LESS_SUGAR = 'Less sugar';
 const NO_SUGAR = 'No sugar';
-const SOUTH_INDIAN_CATEGORY = 'Indian > South Indian';
-const NORTH_INDIAN_CATEGORY = 'Indian > North Indian';
-const ITALIAN_CATEGORY = 'Global > Italian';
-const STREET_FOOD_CATEGORY = 'Global > Street Food';
-const INDO_CHINESE_CATEGORY = 'Asian > Indo-Chinese';
-const HOT_BEVERAGES_CATEGORY = 'Beverages > Hot';
-const COLD_BEVERAGES_CATEGORY = 'Beverages > Cold';
-const INDIAN_DESSERTS_CATEGORY = 'Desserts > Indian';
+const SOUTH_INDIAN_CATEGORY = 'भारतीय > दक्षिण भारतीय';
+const NORTH_INDIAN_CATEGORY = 'भारतीय > उत्तर भारतीय';
+const ITALIAN_CATEGORY = 'विश्व > इटालियन';
+const STREET_FOOD_CATEGORY = 'विश्व > स्ट्रीट फूड';
+const INDO_CHINESE_CATEGORY = 'एशियाई > इंडो-चाइनीज़';
+const HOT_BEVERAGES_CATEGORY = 'पेय पदार्थ > गरम';
+const COLD_BEVERAGES_CATEGORY = 'पेय पदार्थ > ठंडा';
+const INDIAN_DESSERTS_CATEGORY = 'मिठाई > भारतीय';
 
 const SPECIAL_INSTRUCTIONS_BY_CATEGORY: Record<string, string[]> = {
   [SOUTH_INDIAN_CATEGORY]: ['Extra crispy', 'Less oil', 'Less spicy', 'Extra spicy', 'No onion'],

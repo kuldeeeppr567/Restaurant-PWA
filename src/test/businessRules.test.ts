@@ -89,13 +89,13 @@ describe('Billing calculations', () => {
 
 describe('Category-driven instructions', () => {
   it('returns South Indian instructions for dosa-style items', () => {
-    expect(getSpecialInstructionsForCategory('Indian > South Indian')).toEqual(
+    expect(getSpecialInstructionsForCategory('भारतीय > दक्षिण भारतीय')).toEqual(
       expect.arrayContaining(['Extra crispy', 'Less oil'])
     );
   });
 
   it('returns beverage-specific instructions for cold drinks', () => {
-    expect(getSpecialInstructionsForCategory('Beverages > Cold')).toEqual(
+    expect(getSpecialInstructionsForCategory('पेय पदार्थ > ठंडा')).toEqual(
       expect.arrayContaining(['Less sugar', 'No ice'])
     );
   });

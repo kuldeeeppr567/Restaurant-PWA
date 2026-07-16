@@ -263,6 +263,29 @@ export default function OrderPage() {
       {statusOrder.map((status) => {
         const items = grouped[status];
         if (!items || items.length === 0) return null;
+        if (status === 'draft') return (
+          <div key={status} style={{ marginBottom: '1rem' }}>
+            {items.map((item) => (
+              <div key={item.id} className="card" style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <strong>{item.itemName}</strong> x{item.quantity}
+                  <span style={{ marginLeft: '0.5rem', color: 'var(--text-secondary)' }}>
+                    ₹{item.priceSnapshot * item.quantity}
+                  </span>
+                  {item.specialInstructions.length > 0 && (
+                    <div style={{ fontSize: '0.8rem', color: 'var(--warning)' }}>
+                      {item.specialInstructions.join(', ')}
+                    </div>
+                  )}
+                  {item.customNotes && (
+                    <div style={{ fontSize: '0.8rem', fontStyle: 'italic' }}>{item.customNotes}</div>
+                  )}
+                </div>
+                <button className="btn btn-danger" onClick={() => removeOrderItem(item.id!)}>{t.orderPage.remove}</button>
+              </div>
+            ))}
+          </div>
+        );
         const statusLabel = t.orderStatus[status as OrderItemStatus] ?? status;
         return (
           <div key={status} style={{ marginBottom: '1rem' }}>
