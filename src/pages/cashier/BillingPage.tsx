@@ -8,6 +8,7 @@ import { orderRepository } from '../../repositories/orderRepository.ts';
 import { paymentRepository } from '../../repositories/paymentRepository.ts';
 import type { RestaurantTable, DiningSession, OrderItem, PaymentMethod, TableStatus } from '../../types/index.ts';
 import { useLanguage } from '../../hooks/useLanguage.ts';
+import { formatTableName } from '../../i18n/index.ts';
 
 const paymentIcons: Record<PaymentMethod, ReactNode> = {
   cash: <Wallet size={18} />,
@@ -20,7 +21,7 @@ const paymentIcons: Record<PaymentMethod, ReactNode> = {
 
 export default function BillingPage() {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
   const [tables, setTables] = useState<RestaurantTable[]>([]);
   const [selectedTable, setSelectedTable] = useState<RestaurantTable | null>(null);
   const [session, setSession] = useState<DiningSession | null>(null);
@@ -153,7 +154,7 @@ export default function BillingPage() {
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="text-left">
-                    <div className="text-2xl font-bold">{table.name}</div>
+                    <div className="text-2xl font-bold">{formatTableName(table.name, lang)}</div>
                     <div style={{ marginTop: 'var(--spacing-1)' }} className={`status-badge ${statusClass}`}>{statusLabel}</div>
                   </div>
                 </motion.button>
@@ -172,7 +173,7 @@ export default function BillingPage() {
       </button>
 
       <div className="card billing-summary" style={{ marginBottom: '20px' }}>
-        <h1 className="page-title" style={{ fontSize: '1.8rem', marginBottom: 6 }}>{selectedTable.name} {t.billingPage.billSuffix}</h1>
+        <h1 className="page-title" style={{ fontSize: '1.8rem', marginBottom: 6 }}>{formatTableName(selectedTable.name, lang)} {t.billingPage.billSuffix}</h1>
         <p className="page-subtitle">{t.billingPage.billSubtitle}</p>
       </div>
 

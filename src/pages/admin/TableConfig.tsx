@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { tableRepository } from '../../repositories/tableRepository.ts';
 import type { RestaurantTable, TableStatus } from '../../types/index.ts';
 import { useLanguage } from '../../hooks/useLanguage.ts';
+import { formatTableName } from '../../i18n/index.ts';
 
 export default function TableConfig() {
   const [tables, setTables] = useState<RestaurantTable[]>([]);
@@ -12,7 +13,7 @@ export default function TableConfig() {
   const [newCapacity, setNewCapacity] = useState(4);
   const [showAdd, setShowAdd] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
 
   const loadTables = useCallback(async () => {
     const all = await tableRepository.getAll();
@@ -61,7 +62,7 @@ export default function TableConfig() {
       alert(t.tableConfig.cantDeleteMsg);
       return;
     }
-    if (!window.confirm(t.tableConfig.confirmDelete(table.name))) return;
+    if (!window.confirm(t.tableConfig.confirmDelete(formatTableName(table.name, lang)))) return;
     const { db } = await import('../../db/index.ts');
     await db.restaurantTables.delete(table.id!);
     await loadTables();
@@ -163,7 +164,7 @@ export default function TableConfig() {
                 <>
                   <div className="flex justify-between items-start">
                     <div>
-                      <div className="font-bold text-lg">{table.name}</div>
+                      <div className="font-bold text-lg">{formatTableName(table.name, lang)}</div>
                       <div className="text-sm text-gray-600">{t.tableConfig.capacityLabel}: {table.capacity}</div>
                       <div className="text-sm text-gray-500">
                         {statusLabel}

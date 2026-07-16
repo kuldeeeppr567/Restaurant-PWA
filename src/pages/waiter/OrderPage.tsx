@@ -7,6 +7,7 @@ import { sessionRepository } from '../../repositories/sessionRepository.ts';
 import { menuRepository } from '../../repositories/menuRepository.ts';
 import { orderRepository } from '../../repositories/orderRepository.ts';
 import { useLanguage } from '../../hooks/useLanguage.ts';
+import { formatTableName } from '../../i18n/index.ts';
 
 interface DraftItem {
   menuItem: MenuItem;
@@ -28,7 +29,7 @@ function splitCategory(category: string): { broad: string; sub: string } {
 export default function OrderPage() {
   const { tableId } = useParams<{ tableId: string }>();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
   const [table, setTable] = useState<RestaurantTable | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [sessionId, setSessionId] = useState<number | null>(null);
@@ -251,7 +252,7 @@ export default function OrderPage() {
   return (
     <div className="page-container">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-        <h1>{t.orderPage.title(table.name)}</h1>
+        <h1>{t.orderPage.title(formatTableName(table.name, lang))}</h1>
         <button className="btn btn-secondary" onClick={() => navigate('/waiter/tables')}>{t.common.back}</button>
       </div>
 

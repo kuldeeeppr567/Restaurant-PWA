@@ -90,17 +90,17 @@ describe('Billing calculations', () => {
 describe('Category-driven instructions', () => {
   it('returns South Indian instructions for dosa-style items', () => {
     expect(getSpecialInstructionsForCategory('भारतीय > दक्षिण भारतीय')).toEqual(
-      expect.arrayContaining(['Extra crispy', 'Less oil'])
+      expect.arrayContaining(['ज़्यादा कुरकुरा', 'कम तेल'])
     );
   });
 
   it('returns beverage-specific instructions for cold drinks', () => {
     expect(getSpecialInstructionsForCategory('पेय पदार्थ > ठंडा')).toEqual(
-      expect.arrayContaining(['Less sugar', 'No ice'])
+      expect.arrayContaining(['कम चीनी', 'बर्फ़ नहीं'])
     );
   });
 
   it('falls back to a safe default for unknown categories', () => {
-    expect(getSpecialInstructionsForCategory('Custom > Specials')).toEqual(['Less spicy', 'No onion']);
+    expect(getSpecialInstructionsForCategory('Custom > Specials')).toEqual(['कम मसालेदार', 'प्याज़ नहीं']);
   });
 });

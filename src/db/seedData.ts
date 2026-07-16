@@ -114,21 +114,21 @@ export async function loadDemoData(): Promise<void> {
     // --- Active sessions ---
     const session1Id = await db.diningSessions.add({
       tableId: 1,
-      tableName: 'Table 1',
+      tableName: 'टेबल 1',
       openedAt: minutesAgo(45),
       status: 'occupied',
     } as DiningSession);
 
     const session2Id = await db.diningSessions.add({
       tableId: 3,
-      tableName: 'Table 3',
+      tableName: 'टेबल 3',
       openedAt: minutesAgo(30),
       status: 'occupied',
     } as DiningSession);
 
     const session3Id = await db.diningSessions.add({
       tableId: 5,
-      tableName: 'Table 5',
+      tableName: 'टेबल 5',
       openedAt: minutesAgo(60),
       status: 'billing_requested',
     } as DiningSession);
@@ -141,18 +141,18 @@ export async function loadDemoData(): Promise<void> {
       if (i === 1) { status = 'occupied'; currentSessionId = session1Id as number; }
       if (i === 3) { status = 'occupied'; currentSessionId = session2Id as number; }
       if (i === 5) { status = 'billing_requested'; currentSessionId = session3Id as number; }
-      tablesData.push({ name: `Table ${i}`, status, capacity: 4, currentSessionId });
+      tablesData.push({ name: `टेबल ${i}`, status, capacity: 4, currentSessionId });
     }
     await db.restaurantTables.bulkAdd(tablesData as RestaurantTable[]);
 
     // --- Active order items ---
     await addOrderItems(session1Id as number, 1, minutesAgo(40), [
-      { name: 'मसाला डोसा', qty: 2, status: 'submitted', specialInstructions: ['Extra crispy'] },
+      { name: 'मसाला डोसा', qty: 2, status: 'submitted', specialInstructions: ['ज़्यादा कुरकुरा'] },
       { name: 'फ़िल्टर कॉफ़ी', qty: 2, status: 'submitted' },
     ]);
 
     await addOrderItems(session2Id as number, 3, minutesAgo(25), [
-      { name: 'मार्गेरिटा पिज़्ज़ा', qty: 1, status: 'preparing', specialInstructions: ['Less spicy'] },
+      { name: 'मार्गेरिटा पिज़्ज़ा', qty: 1, status: 'preparing', specialInstructions: ['कम मसालेदार'] },
       { name: 'फ्रेश लाइम सोडा', qty: 1, status: 'ready' },
     ]);
 
@@ -164,8 +164,8 @@ export async function loadDemoData(): Promise<void> {
 
     // --- Service requests ---
     await db.serviceRequests.bulkAdd([
-      { sessionId: session1Id as number, tableId: 1, tableName: 'Table 1', type: 'water', notes: 'Need drinking water', requestedAt: minutesAgo(10), completed: false },
-      { sessionId: session2Id as number, tableId: 3, tableName: 'Table 3', type: 'plates_spoons', notes: 'Need extra plates', requestedAt: minutesAgo(5), completed: false },
+      { sessionId: session1Id as number, tableId: 1, tableName: 'टेबल 1', type: 'water', notes: 'पीने का पानी चाहिए', requestedAt: minutesAgo(10), completed: false },
+      { sessionId: session2Id as number, tableId: 3, tableName: 'टेबल 3', type: 'plates_spoons', notes: 'अतिरिक्त प्लेट चाहिए', requestedAt: minutesAgo(5), completed: false },
     ] as ServiceRequest[]);
 
     // --- Historical sessions (15 completed, past 7 days) ---
@@ -203,7 +203,7 @@ export async function loadDemoData(): Promise<void> {
 
       const sessionId = await db.diningSessions.add({
         tableId: entry.tableNum,
-        tableName: `Table ${entry.tableNum}`,
+        tableName: `टेबल ${entry.tableNum}`,
         openedAt,
         closedAt,
         status: 'paid',
