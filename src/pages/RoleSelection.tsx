@@ -328,6 +328,7 @@ export default function RoleSelection() {
             key={r.key}
             className={`role-btn role-btn--${r.key}`}
             onClick={() => navigate(r.path)}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigate(r.path)}
             whileHover={{ scale: 1.1, y: -8 }}
             whileTap={{ scale: 0.82, rotateX: 12, rotateY: -8 }}
             transition={{ type: 'spring', stiffness: 380, damping: 18 }}

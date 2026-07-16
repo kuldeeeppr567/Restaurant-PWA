@@ -669,10 +669,10 @@ label {
   border-radius: 50%;
 }
 
-.role-btn--waiter .role-icon  { filter: drop-shadow(0 6px 18px rgba(37,99,235,0.45)); }
+.role-btn--waiter .role-icon { filter: drop-shadow(0 6px 18px rgba(37,99,235,0.45)); }
 .role-btn--kitchen .role-icon { filter: drop-shadow(0 6px 18px rgba(217,119,6,0.45)); }
 .role-btn--cashier .role-icon { filter: drop-shadow(0 6px 18px rgba(5,150,105,0.45)); }
-.role-btn--admin .role-icon   { filter: drop-shadow(0 6px 18px rgba(124,58,237,0.45)); }
+.role-btn--admin .role-icon { filter: drop-shadow(0 6px 18px rgba(124,58,237,0.45)); }
 
 .role-btn h2 {
   margin: 0;
