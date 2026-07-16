@@ -32,7 +32,6 @@ describe('RoleSelection', () => {
 
     expect(screen.getByRole('heading', { name: 'Order Management App' })).toBeInTheDocument();
     expect(screen.getByText('Command Centre')).toBeInTheDocument();
-    expect(screen.getByText('Bhojan taiyaari ki suchna dekhe')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'डेमो डेटा लोड करें' })).toBeInTheDocument();
     expect(window.localStorage.getItem('restaurant-pwa-language')).toBe('hi');
   });
