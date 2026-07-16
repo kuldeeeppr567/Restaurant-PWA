@@ -30,8 +30,8 @@ describe('RoleSelection', () => {
 
     await user.selectOptions(screen.getByLabelText('Language'), 'hi');
 
-    expect(screen.getByRole('heading', { name: 'Order Management App' })).toBeInTheDocument();
-    expect(screen.getByText('Command Centre')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'ऑर्डर मैनेजमेंट ऐप' })).toBeInTheDocument();
+    expect(screen.getByText('कमांड सेंटर')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'डेमो डेटा लोड करें' })).toBeInTheDocument();
     expect(window.localStorage.getItem('restaurant-pwa-language')).toBe('hi');
   });

@@ -16,8 +16,8 @@ interface DraftItem {
   customNotes: string;
 }
 
-const FALLBACK_BROAD_CATEGORY = 'Uncategorized';
-const FALLBACK_SUB_CATEGORY = 'General';
+const FALLBACK_BROAD_CATEGORY = 'अवर्गीकृत';
+const FALLBACK_SUB_CATEGORY = 'सामान्य';
 
 function splitCategory(category: string): { broad: string; sub: string } {
   const [broad, ...rest] = category.split('>').map((part) => part.trim()).filter(Boolean);
