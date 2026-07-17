@@ -296,11 +296,6 @@ img {
   z-index: 100;
 }
 
-.bottom-nav a.active {
-  color: var(--primary);
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.14), rgba(147, 51, 234, 0.12));
-}
-
 .bottom-nav a {
   display: flex;
   flex-direction: column;
@@ -311,6 +306,11 @@ img {
   min-width: 64px;
   color: var(--text-secondary);
   font-size: 0.67rem;
+}
+
+.bottom-nav a.active {
+  color: var(--primary);
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.14), rgba(147, 51, 234, 0.12));
 }
 
 .online-indicator,
