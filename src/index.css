@@ -17,7 +17,7 @@
   --border-item-hover: rgba(79, 70, 229, 0.28);
   --row-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
   --btn-glow: linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 45%);
-  --role-icon-bg: radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.44), rgba(var(--role-color), 0.16) 58%, rgba(var(--role-color), 0.28));
+  --role-icon-bg: radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.44), rgba(var(--role-color, 124, 58, 237), 0.16) 58%, rgba(var(--role-color, 124, 58, 237), 0.28));
   --role-icon-shadow: inset 0 0 14px rgba(255, 255, 255, 0.35);
   --status-tint-base: rgba(255,255,255,0.74);
 
@@ -101,7 +101,7 @@
   --border-item-hover: rgba(129, 140, 248, 0.4);
   --row-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   --btn-glow: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 45%);
-  --role-icon-bg: radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.1), rgba(var(--role-color), 0.16) 58%, rgba(var(--role-color), 0.28));
+  --role-icon-bg: radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.1), rgba(var(--role-color, 124, 58, 237), 0.16) 58%, rgba(var(--role-color, 124, 58, 237), 0.28));
   --role-icon-shadow: inset 0 0 14px rgba(255, 255, 255, 0.05);
   --status-tint-base: rgba(15, 23, 42, 0.74);
 
@@ -902,10 +902,10 @@ label {
   height: 116px;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(var(--role-color), 0.52);
+  border: 1px solid rgba(var(--role-color, 124, 58, 237), 0.52);
   border-radius: 50%;
   background: var(--role-icon-bg);
-  box-shadow: 0 0 0 5px rgba(var(--role-color), 0.1), 0 0 24px rgba(var(--role-color), 0.46), var(--role-icon-shadow);
+  box-shadow: 0 0 0 5px rgba(var(--role-color, 124, 58, 237), 0.1), 0 0 24px rgba(var(--role-color, 124, 58, 237), 0.46), var(--role-icon-shadow);
 }
 
 .role-footer {
