@@ -228,52 +228,55 @@ export default function MenuManagement() {
       {Object.keys(groupedItems).length === 0 ? (
         <p className="text-gray-500">{t.menuManagement.noItems}</p>
       ) : (
-        Object.entries(groupedItems)
-          .sort(([a], [b]) => a.localeCompare(b))
-          .map(([category, catItems]) => (
-            <div key={category} className="mb-6">
-              <h2 className="text-lg font-bold mb-2 border-b pb-1">{category}</h2>
-              <div className="space-y-2">
-                {catItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className={`flex items-center justify-between p-3 border rounded ${
-                      !item.available ? 'bg-gray-100 opacity-60' : ''
-                    }`}
-                  >
-                    <div>
-                      <span className="font-medium">{item.name}</span>
-                      <span className="ml-2 text-gray-600">₹{item.price}</span>
+        <div className="space-y-4">
+          {Object.entries(groupedItems)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([category, catItems]) => (
+              <section key={category} className="menu-category">
+                <div className="menu-category-header">
+                  <h2 className="menu-category-title">{category}</h2>
+                  <span className="menu-category-count">{catItems.length}</span>
+                </div>
+                <div className="space-y-2">
+                  {catItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className={`menu-item-row ${!item.available ? 'is-unavailable' : ''}`}
+                    >
+                      <div>
+                        <span className="font-medium">{item.name}</span>
+                        <span className="menu-item-price">₹{item.price}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleToggleAvailability(item)}
+                          className={`px-3 py-1 rounded text-sm ${
+                            item.available
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}
+                        >
+                          {item.available ? t.menuManagement.availableBtn : t.menuManagement.unavailableBtn}
+                        </button>
+                        <button
+                          onClick={() => openEditForm(item)}
+                          className="px-3 py-1 rounded text-sm bg-blue-100 text-blue-800"
+                        >
+                          {t.menuManagement.editBtn}
+                        </button>
+                        <button
+                          onClick={() => handleArchive(item)}
+                          className="px-3 py-1 rounded text-sm bg-red-100 text-red-800"
+                        >
+                          {t.menuManagement.archiveBtn}
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleToggleAvailability(item)}
-                        className={`px-3 py-1 rounded text-sm ${
-                          item.available
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}
-                      >
-                        {item.available ? t.menuManagement.availableBtn : t.menuManagement.unavailableBtn}
-                      </button>
-                      <button
-                        onClick={() => openEditForm(item)}
-                        className="px-3 py-1 rounded text-sm bg-blue-100 text-blue-800"
-                      >
-                        {t.menuManagement.editBtn}
-                      </button>
-                      <button
-                        onClick={() => handleArchive(item)}
-                        className="px-3 py-1 rounded text-sm bg-red-100 text-red-800"
-                      >
-                        {t.menuManagement.archiveBtn}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))
+                  ))}
+                </div>
+              </section>
+            ))}
+        </div>
       )}
     </div>
   );
