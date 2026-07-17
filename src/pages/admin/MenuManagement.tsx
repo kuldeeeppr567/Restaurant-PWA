@@ -19,6 +19,32 @@ const emptyForm: MenuFormData = {
   available: true,
 };
 
+function CategoryBreadcrumb({ category }: { category: string }) {
+  const segments = category
+    .split('>')
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (segments.length === 0) {
+    return <h2 className="menu-category-title">{category}</h2>;
+  }
+
+  return (
+    <h2 className="menu-category-title menu-category-breadcrumb">
+      {segments.map((segment, index) => (
+        <span key={`${segment}-${index}`} className="menu-category-crumb-group">
+          {index > 0 && (
+            <span className="menu-category-crumb-sep" aria-hidden="true">
+              ›
+            </span>
+          )}
+          <span className="menu-category-crumb">{segment}</span>
+        </span>
+      ))}
+    </h2>
+  );
+}
+
 export default function MenuManagement() {
   const [items, setItems] = useState<MenuItem[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -234,7 +260,7 @@ export default function MenuManagement() {
             .map(([category, catItems]) => (
               <section key={category} className="menu-category">
                 <div className="menu-category-header">
-                  <h2 className="menu-category-title">{category}</h2>
+                  <CategoryBreadcrumb category={category} />
                   <span className="menu-category-count">{catItems.length}</span>
                 </div>
                 <div className="space-y-2">
