@@ -87,6 +87,23 @@
   background: linear-gradient(150deg, rgba(148, 163, 184, 0.3), rgba(147, 51, 234, 0.24) 40%, transparent 70%);
 }
 
+/* Dark mode: lighten status badge text so it stays readable on tinted backgrounds */
+[data-theme='dark'] .status-badge.available,
+[data-theme='dark'] .badge-success { color: #6ee7b7; }
+[data-theme='dark'] .status-badge.occupied,
+[data-theme='dark'] .badge-warning { color: #fcd34d; }
+[data-theme='dark'] .status-badge.order-in-progress,
+[data-theme='dark'] .status-badge.preparing,
+[data-theme='dark'] .badge-info { color: #a5b4fc; }
+[data-theme='dark'] .status-badge.billing-requested,
+[data-theme='dark'] .status-badge.billing { color: #d8b4fe; }
+[data-theme='dark'] .status-badge.ready,
+[data-theme='dark'] .status-badge.ready-for-cleaning,
+[data-theme='dark'] .status-badge.paid,
+[data-theme='dark'] .status-badge.cleaning { color: #6ee7b7; }
+[data-theme='dark'] .status-badge.served { color: #cbd5e1; }
+[data-theme='dark'] .status-badge.cancelled { color: #fca5a5; }
+
 *,
 *::before,
 *::after {
@@ -1130,7 +1147,12 @@ th:last-child {
   background: rgba(255, 255, 255, 0.94);
   border: 1px solid rgba(148, 163, 184, 0.25);
   box-shadow: var(--shadow-soft);
+  color: #0f172a;
 }
+
+/* Receipt keeps a white surface in every theme, so force readable dark text */
+.receipt .text-gray-500,
+.receipt .text-gray-600 { color: #475569; }
 
 /* Utility classes used in existing pages */
 .p-4 { padding: var(--spacing-3); }
@@ -1259,6 +1281,25 @@ th:last-child {
 .border-orange-500,
 .border-green-500,
 .border-blue-500 { border-color: rgba(148, 163, 184, 0.35); }
+
+/* Dark mode: adapt Tailwind-style utility colours for readable contrast */
+[data-theme='dark'] .text-blue-800 { color: #93c5fd; }
+[data-theme='dark'] .text-green-800 { color: #6ee7b7; }
+[data-theme='dark'] .text-yellow-800 { color: #fcd34d; }
+[data-theme='dark'] .text-red-700,
+[data-theme='dark'] .text-red-800,
+[data-theme='dark'] .text-red-600 { color: #fca5a5; }
+[data-theme='dark'] .text-gray-400 { color: #94a3b8; }
+[data-theme='dark'] .bg-blue-50,
+[data-theme='dark'] .bg-gray-50,
+[data-theme='dark'] .bg-red-50,
+[data-theme='dark'] .bg-yellow-50,
+[data-theme='dark'] .bg-green-50,
+[data-theme='dark'] .bg-orange-50 { background: rgba(24, 31, 51, 0.55); }
+[data-theme='dark'] .bg-green-100,
+[data-theme='dark'] .bg-red-100,
+[data-theme='dark'] .bg-blue-100,
+[data-theme='dark'] .bg-gray-100 { background: rgba(24, 31, 51, 0.72); }
 
 .no-print {
   display: flex;
