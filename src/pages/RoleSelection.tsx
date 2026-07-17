@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { loadDemoData, resetDemoData } from '../db/seedData.ts';
+import { useTheme } from '../hooks/useTheme.ts';
 
 const OrderIcon3D = () => (
   <svg viewBox="0 0 80 80" width="100" height="100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -192,6 +193,8 @@ const copy = {
   en: {
     languageLabel: 'Language',
     languageDisabledHint: 'Language selection is unavailable while demo data is updating.',
+    themeToLight: 'Light mode',
+    themeToDark: 'Dark mode',
     title: 'Order Management App',
     subtitle: 'Command Centre',
     roles: {
@@ -214,6 +217,8 @@ const copy = {
   hi: {
     languageLabel: 'भाषा चुनें',
     languageDisabledHint: 'डेमो डेटा अपडेट होने के दौरान भाषा नहीं बदली जा सकती।',
+    themeToLight: 'लाइट मोड',
+    themeToDark: 'डार्क मोड',
     title: 'ऑर्डर मैनेजमेंट ऐप',
     subtitle: 'कमांड सेंटर',
     roles: {
@@ -236,6 +241,8 @@ const copy = {
 } satisfies Record<Language, {
   languageLabel: string;
   languageDisabledHint: string;
+  themeToLight: string;
+  themeToDark: string;
   title: string;
   subtitle: string;
   roles: Record<RoleKey, { title: string; description: string }>;
@@ -258,6 +265,7 @@ export default function RoleSelection() {
   );
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
   const [tappedRole, setTappedRole] = useState<RoleKey | null>(null);
+  const { theme, toggleTheme } = useTheme();
   const text = copy[language];
   const isBusy = pendingAction !== null;
 
@@ -304,26 +312,40 @@ export default function RoleSelection() {
       <div className="role-hero">
         <h1 className="page-title">{text.title}</h1>
         {text.subtitle && <p className="page-subtitle">{text.subtitle}</p>}
-        <div className="role-language-selector">
-          <label htmlFor="language-select" className="role-language-label">
-            {text.languageLabel}
-          </label>
-          <select
-            id="language-select"
-            value={language}
-            aria-label={text.languageLabel}
-            aria-describedby={isBusy ? 'language-selector-help' : undefined}
-            onChange={(e) => handleLanguageChange(e.target.value as Language)}
-            disabled={isBusy}
+        <div className="role-hero-controls">
+          <button
+            type="button"
+            className="role-theme-toggle"
+            onClick={toggleTheme}
+            aria-pressed={theme === 'dark'}
+            aria-label={theme === 'dark' ? text.themeToLight : text.themeToDark}
           >
-            <option value="en">English</option>
-            <option value="hi">हिंदी</option>
-          </select>
-          {isBusy && (
-            <p id="language-selector-help" className="sr-only">
-              {text.languageDisabledHint}
-            </p>
-          )}
+            <span className="role-theme-toggle-icon" aria-hidden="true">
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </span>
+            <span>{theme === 'dark' ? text.themeToLight : text.themeToDark}</span>
+          </button>
+          <div className="role-language-selector">
+            <label htmlFor="language-select" className="role-language-label">
+              {text.languageLabel}
+            </label>
+            <select
+              id="language-select"
+              value={language}
+              aria-label={text.languageLabel}
+              aria-describedby={isBusy ? 'language-selector-help' : undefined}
+              onChange={(e) => handleLanguageChange(e.target.value as Language)}
+              disabled={isBusy}
+            >
+              <option value="en">English</option>
+              <option value="hi">हिंदी</option>
+            </select>
+            {isBusy && (
+              <p id="language-selector-help" className="sr-only">
+                {text.languageDisabledHint}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 

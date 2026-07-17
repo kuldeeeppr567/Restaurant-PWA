@@ -3,6 +3,11 @@ import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 import './index.css';
 import App from './App.tsx';
+import { applyTheme, getStoredTheme } from './hooks/useTheme.ts';
+
+// Apply the persisted theme before the first paint to avoid a flash.
+applyTheme(getStoredTheme());
+
 
 // Register service worker with update prompt
 const updateSW = registerSW({
